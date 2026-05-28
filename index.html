@@ -145,14 +145,13 @@
       height: 100%;
     }
     body {
-      min-height: 100dvh;
+      height: 100%;
+      overflow: hidden;
       background-color: var(--bg-darkest);
       color: var(--text-main);
       font-family: var(--font-family);
       font-size: 14px;
       line-height: 1.5;
-      overflow-x: hidden;
-      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -2613,6 +2612,9 @@
         width: auto;
         min-width: fit-content;
       }
+      .modal-sidebar-ds > div:first-child > span {
+        display: none;
+      }
       .modal-sidebar-tabs {
         flex-direction: row;
         justify-content: flex-end;
@@ -4059,20 +4061,7 @@
           </div>
         </div>
 
-        <!-- SHARED MODAL FOOTER -->
-        <div class="modal-footer-ds" style="margin-top:auto; padding-top: 20px;">
-          <button class="modal-button-ds cancel" id="cancelBtn">
-            <i data-lucide="x" style="width:16px;height:16px;"></i>
-            <span>Cancel</span>
-          </button>
-          <button class="modal-button-ds save" id="saveBtn">
-            <i data-lucide="check" style="width:16px;height:16px;"></i>
-            <span>Apply Changes</span>
-          </button>
-          <!-- Hidden buttons for JS compatibility if needed -->
-          <button id="saveBtn2" style="display:none;"></button>
-          <button id="cancelBtn2" style="display:none;"></button>
-        </div>
+        <!-- SHARED MODAL FOOTER (Removed for auto-save) -->
       </main>
     </div>
   </div>
@@ -4081,12 +4070,12 @@
   <div class="backdrop-modal" id="searchModal">
     <div class="search-modal-box">
       <!-- Search Input Bar -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-          <i data-lucide="search" style="width: 18px; height: 18px; color: var(--text-muted);"></i>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <button class="modal-close-icon-btn" id="searchModalCloseBtn" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 6px;"><i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i></button>
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+          <i data-lucide="search" style="width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0;"></i>
           <input type="search" id="modalSearchInput" placeholder="Search chats..." style="background: none; border: none; outline: none; color: var(--text-main); font-size: 1.1rem; width: 100%; font-family: var(--font-family);" autocomplete="off" spellcheck="false">
         </div>
-        <button class="modal-close-icon-btn" id="searchModalCloseBtn"><i data-lucide="x"></i></button>
       </div>
 
       <!-- New Chat Capsule -->
@@ -4626,8 +4615,6 @@
       connectBtn: document.getElementById('connectBtn'),
       disconnectBtn: document.getElementById('disconnectBtn'),
       testStatus: document.getElementById('testStatus'),
-      cancelBtn: document.getElementById('cancelBtn'),
-      saveBtn: document.getElementById('saveBtn'),
       searchSidebarBtn: document.getElementById('searchSidebarBtn'),
       sidebarSearchInput: document.getElementById('sidebarSearchInput'),
       sidebarSearchBox: document.getElementById('sidebarSearchBox')
@@ -4727,6 +4714,7 @@
           if (dot.classList.contains('dot-custom')) return; // handled by input change
           const colorName = dot.classList[1].replace('dot-', '');
           applyAccentColor(colorName);
+          autoSaveSettings();
         });
       });
 
@@ -4737,6 +4725,7 @@
         }
         customPicker.addEventListener('input', (e) => {
           applyAccentColor(e.target.value);
+          autoSaveSettings();
         });
       }
 
@@ -4970,10 +4959,17 @@
       // Fix mobile keyboard covering the prompt input
       (function fixMobileKeyboard() {
         const inputWrapper = document.querySelector('.input-wrapper-ds');
+        const appLayout = document.querySelector('.app-layout');
         if (!window.visualViewport || !inputWrapper) return;
         let vpHandler = () => {
           const diff = window.innerHeight - window.visualViewport.height;
-          inputWrapper.style.bottom = diff > 50 ? diff + 'px' : '';
+          if (diff > 50) {
+            inputWrapper.style.bottom = diff + 'px';
+            if (appLayout) appLayout.style.height = window.visualViewport.height + 'px';
+          } else {
+            inputWrapper.style.bottom = '';
+            if (appLayout) appLayout.style.height = '';
+          }
         };
         window.visualViewport.addEventListener('resize', vpHandler);
         window.addEventListener('orientationchange', () => setTimeout(vpHandler, 300));
@@ -5591,19 +5587,25 @@
     }
 
     function storeSettings() {
+      autoSaveSettings();
+      hideModal();
+      showNotification('Settings saved.');
+    }
+
+    function autoSaveSettings() {
+      if (!ui.proxyField || !ui.systemPromptField) return;
       appState.settings.proxyUrl = ui.proxyField.value.trim() || 'http://localhost:18080/v1';
       appState.settings.systemPrompt = ui.systemPromptField.value.trim();
 
-      appState.settings.flowtokenAnimation = document.getElementById('flowtokenAnimationSelect').value;
-      appState.settings.flowtokenSep = document.getElementById('flowtokenSepSelect').value;
-      appState.settings.flowtokenDuration = document.getElementById('flowtokenDurationRange').value + 's';
+      const animSelect = document.getElementById('flowtokenAnimationSelect');
+      const sepSelect = document.getElementById('flowtokenSepSelect');
+      const durRange = document.getElementById('flowtokenDurationRange');
+      if (animSelect) appState.settings.flowtokenAnimation = animSelect.value;
+      if (sepSelect) appState.settings.flowtokenSep = sepSelect.value;
+      if (durRange) appState.settings.flowtokenDuration = durRange.value + 's';
 
-      // accentColor is already in appState.settings because applyAccentColor updates it
       localStorage.setItem('collabllm_settings', JSON.stringify(appState.settings));
       debounceSyncToDrive();
-      hideModal();
-      verifyBackendConnection();
-      showNotification('Settings saved.');
     }
 
     // Render History Chats inside Sidebar Grouped by Calendar
@@ -6067,6 +6069,51 @@
     async function sendMessage() {
       const text = ui.promptInput.textContent.trim();
       if (!text) return;
+
+      const isConnectionUrl = /^(https?:\/\/)?([\w\-]+\.)*(trycloudflare\.com|ngrok-free\.app|ngrok\.io|localhost|127\.0\.0\.1)(:\d+)?(\/.*)?$/i.test(text) ||
+                             text.includes('trycloudflare.com') ||
+                             text.includes('ngrok-free.app') ||
+                             text.includes('ngrok.io') ||
+                             text.includes('localhost:') ||
+                             text.includes('127.0.0.1:');
+
+      if (isConnectionUrl) {
+        let formattedUrl = text;
+        if (!/^https?:\/\//i.test(formattedUrl)) {
+          if (/^(localhost|127\.0\.0\.1)/i.test(formattedUrl)) {
+            formattedUrl = 'http://' + formattedUrl;
+          } else {
+            formattedUrl = 'https://' + formattedUrl;
+          }
+        }
+        formattedUrl = formattedUrl.replace(/\/+$/, "");
+        if (!/\/v1$/i.test(formattedUrl) && !/\/api$/i.test(formattedUrl)) {
+          formattedUrl = formattedUrl + '/v1';
+        }
+
+        appState.settings.proxyUrl = formattedUrl;
+        localStorage.setItem('collabllm_settings', JSON.stringify(appState.settings));
+        if (ui.proxyField) ui.proxyField.value = formattedUrl;
+
+        ui.promptInput.innerHTML = '<br class="ProseMirror-trailingBreak">';
+        resizeInputArea(ui.promptInput);
+        
+        window.updateDynamicIsland('Backend Configured', 'Connecting to new backend...', 'connecting');
+        
+        verifyBackendConnection(true).then(online => {
+          if (online) {
+            window.updateDynamicIsland('Backend Connected', 'Successfully connected!', 'online');
+          } else {
+            window.updateDynamicIsland('Connection Failed', 'Could not reach backend.', 'offline');
+          }
+        });
+        return;
+      }
+
+      if (!ui.healthDot.classList.contains('online')) {
+        window.updateDynamicIsland('Not Connected', 'Please connect to backend or paste connection link.', 'offline');
+        return;
+      }
 
       // Lock input controls
       ui.promptInput.contentEditable = 'true';
@@ -6733,23 +6780,40 @@
       document.getElementById('sidebarSettingsBtn').addEventListener('click', displayModal);
       ui.modalCloseBtn.addEventListener('click', () => hideModal(true));
 
-      ui.cancelBtn.addEventListener('click', () => hideModal(true));
-      ui.saveBtn.addEventListener('click', storeSettings);
-
-      document.getElementById('cancelBtn2').addEventListener('click', () => hideModal(true));
-      document.getElementById('saveBtn2').addEventListener('click', storeSettings);
-      document.getElementById('flowtokenDurationRange').addEventListener('input', (e) => {
-        document.getElementById('flowtokenDurationLabel').textContent = e.target.value + 's';
-      });
+      // Auto-save listeners for settings fields
+      if (ui.proxyField) {
+        ui.proxyField.addEventListener('input', () => {
+          autoSaveSettings();
+          verifyBackendConnection();
+        });
+      }
+      if (ui.systemPromptField) {
+        ui.systemPromptField.addEventListener('input', autoSaveSettings);
+      }
+      const animSelect = document.getElementById('flowtokenAnimationSelect');
+      if (animSelect) animSelect.addEventListener('change', autoSaveSettings);
+      
+      const sepSelect = document.getElementById('flowtokenSepSelect');
+      if (sepSelect) sepSelect.addEventListener('change', autoSaveSettings);
+      
+      const durRange = document.getElementById('flowtokenDurationRange');
+      if (durRange) {
+        durRange.addEventListener('input', (e) => {
+          document.getElementById('flowtokenDurationLabel').textContent = e.target.value + 's';
+          autoSaveSettings();
+        });
+      }
 
       ui.connectBtn.addEventListener('click', () => {
         appState.settings.backendDisabled = false;
+        autoSaveSettings();
         runBackendPing(false);
         verifyBackendConnection(true);
       });
 
       ui.disconnectBtn.addEventListener('click', () => {
         appState.settings.backendDisabled = true;
+        autoSaveSettings();
         ui.testStatus.textContent = 'Manually Disconnected';
         ui.testStatus.className = 'modal-test-status disconnected';
         verifyBackendConnection(true);
