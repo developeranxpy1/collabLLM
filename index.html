@@ -1470,6 +1470,7 @@
       border-radius: 50%;
       transition: color 0.15s ease;
       flex-shrink: 0;
+      position: relative;
     }
 
     .ds-mic-btn:hover {
@@ -1479,13 +1480,43 @@
     .ds-mic-btn.recording {
       color: #ef4444;
       background-color: rgba(239, 68, 68, 0.15);
-      animation: recordingPulse 1.5s infinite;
+      animation: recordingPulse 1.2s infinite ease-in-out;
+    }
+    .ds-mic-btn.recording::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(239, 68, 68, 0.3);
+      animation: ringExpand 1.2s infinite ease-out;
+    }
+    .ds-mic-btn.recording::after {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      border: 2px solid rgba(239, 68, 68, 0.15);
+      animation: ringExpand 1.2s 0.4s infinite ease-out;
     }
 
     @keyframes recordingPulse {
       0%   { transform: scale(1); }
       50%  { transform: scale(1.08); }
       100% { transform: scale(1); }
+    }
+    @keyframes ringExpand {
+      0%   { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    .prompt-box-ds.recording {
+      border-color: rgba(239, 68, 68, 0.5) !important;
+      box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.2), 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+      animation: recGlow 1.2s infinite ease-in-out;
+    }
+    @keyframes recGlow {
+      0%, 100% { box-shadow: 0 0 8px 1px rgba(239, 68, 68, 0.15), 0 4px 20px rgba(0, 0, 0, 0.15); }
+      50%      { box-shadow: 0 0 18px 4px rgba(239, 68, 68, 0.3), 0 4px 20px rgba(0, 0, 0, 0.2); }
     }
 
     /* Send / voice button — accent colored circle */
@@ -2185,22 +2216,34 @@
         padding: 6px;
       }
       .di-container-ds {
-        max-width: 200px;
-        top: 5px;
-        height: 32px;
+        max-width: 150px;
+        top: 4px;
+        height: 26px;
       }
       .di-container-ds:hover,
       .di-container-ds:focus-within,
       .di-container-ds.active-click {
-        max-width: 280px;
+        max-width: 320px;
         height: auto;
-        min-height: 90px;
+        min-height: 100px;
+      }
+      .di-tile-ds {
+        width: 18px;
+        height: 18px;
+      }
+      .di-tile-ds i {
+        width: 12px !important;
+        height: 12px !important;
+      }
+      .di-timer-ring {
+        width: 18px;
+        height: 18px;
       }
       .di-title-ds {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
       }
       .di-sub-ds {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
       }
       .di-container-ds:hover .di-title-ds,
       .di-container-ds:focus-within .di-title-ds,
@@ -2213,7 +2256,7 @@
         font-size: 0.75rem;
       }
       .di-badge-ds {
-        font-size: 0.6rem;
+        font-size: 0.55rem;
         padding: 1px 5px;
       }
       .sidebar-header {
@@ -2391,30 +2434,48 @@
         padding: 4px 10px;
       }
       .di-container-ds {
-        max-width: 170px;
-        top: 4px;
-        height: 28px;
+        max-width: 120px;
+        top: 3px;
+        height: 22px;
         transform: translateX(-50%);
       }
       .di-container-ds:hover,
       .di-container-ds:focus-within,
       .di-container-ds.active-click {
-        max-width: 240px;
+        max-width: 260px;
         min-height: 80px;
       }
       .di-title-ds {
-        font-size: 0.70rem;
+        font-size: 0.6rem;
       }
       .di-sub-ds {
-        font-size: 0.60rem;
+        font-size: 0.55rem;
+      }
+      .di-container-ds:hover .di-title-ds,
+      .di-container-ds:focus-within .di-title-ds,
+      .di-container-ds.active-click .di-title-ds {
+        font-size: 0.8rem;
+      }
+      .di-container-ds:hover .di-sub-ds,
+      .di-container-ds:focus-within .di-sub-ds,
+      .di-container-ds.active-click .di-sub-ds {
+        font-size: 0.7rem;
       }
       .di-badge-ds {
-        font-size: 0.55rem;
-        padding: 2px 6px;
+        font-size: 0.5rem;
+        padding: 1px 5px;
       }
       .di-tile-ds {
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
+      }
+      .di-tile-ds i {
+        width: 10px !important;
+        height: 10px !important;
+      }
+      .di-timer-ring {
+        width: 16px;
+        height: 16px;
       }
       .di-actions-ds {
         gap: 4px;
@@ -4218,19 +4279,6 @@
         });
       }
 
-      // Pull to refresh on mobile
-      let _touchStartY = 0;
-      document.addEventListener('touchstart', (e) => {
-        _touchStartY = e.touches[0].clientY;
-      }, { passive: true });
-      document.addEventListener('touchend', (e) => {
-        if (window.innerWidth <= 768 && (e.changedTouches[0].clientY - _touchStartY > 150)) {
-          if (ui.chatLogger.scrollTop <= 0) {
-            window.location.reload();
-          }
-        }
-      });
-
       // Dynamic Island Actions Wiring
       const diBtnSettings = document.getElementById('diBtnSettings');
       const diBtnNewChat = document.getElementById('diBtnNewChat');
@@ -4283,32 +4331,55 @@
       const SpeechRegClass = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRegClass) {
         appState.recognition = new SpeechRegClass();
-        appState.recognition.continuous = false;
+        appState.recognition.continuous = true;
+        appState.recognition.interimResults = true;
         appState.recognition.lang = 'en-US';
+        let _finalTranscript = '';
 
         appState.recognition.onstart = () => {
+          const promptEl = ui.promptInput;
+          _finalTranscript = (promptEl.textContent || promptEl.innerText || '').trim();
+          if (_finalTranscript && !_finalTranscript.endsWith(' ')) _finalTranscript += ' ';
           appState.isRecording = true;
           ui.voiceBtn.classList.add('recording');
-          showNotification('Listening...');
-          window.updateDynamicIsland('Voice Dictation', 'Listening for prompt...', 'listening');
+          document.querySelector('.prompt-box-ds')?.classList.add('recording');
+          window.updateDynamicIsland('Voice Dictation', 'Listening...', 'listening');
         };
 
         appState.recognition.onend = () => {
           appState.isRecording = false;
           ui.voiceBtn.classList.remove('recording');
+          document.querySelector('.prompt-box-ds')?.classList.remove('recording');
+          if (_finalTranscript) {
+            ui.promptInput.textContent = _finalTranscript;
+            resizeInputArea(ui.promptInput);
+          }
           window.updateDynamicIsland('collabLLM Ready', 'Dictation finished', 'online');
         };
 
-appState.recognition.onresult = (evt) => {
-           const dictation = evt.results[0][0].transcript;
-           ui.promptInput.innerHTML += dictation;
-           resizeInputArea(ui.promptInput);
-         };
+        appState.recognition.onresult = (evt) => {
+          let interim = '';
+          for (let i = evt.resultIndex; i < evt.results.length; i++) {
+            const r = evt.results[i];
+            if (r.isFinal) {
+              _finalTranscript += r[0].transcript;
+            } else {
+              interim += r[0].transcript;
+            }
+          }
+          const promptEl = ui.promptInput;
+          if (_finalTranscript || interim) {
+            promptEl.textContent = _finalTranscript + (interim ? ' ' + interim : '');
+            resizeInputArea(promptEl);
+          }
+        };
 
-        appState.recognition.onerror = () => {
-          showNotification('Speech error or permission block.');
+        appState.recognition.onerror = (evt) => {
+          if (evt.error === 'no-speech' || evt.error === 'aborted') return;
+          showNotification('Speech error or permission blocked.');
           appState.isRecording = false;
           ui.voiceBtn.classList.remove('recording');
+          document.querySelector('.prompt-box-ds')?.classList.remove('recording');
         };
       } else {
         ui.voiceBtn.style.display = 'none';
