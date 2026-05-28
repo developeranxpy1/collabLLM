@@ -2197,10 +2197,13 @@
 
     /* Spinner */
     .spin-loader {
-      animation: spi 1.2s linear infinite;
+      animation: spi 1s linear infinite;
+      transform-origin: center;
+      display: inline-block;
     }
     @keyframes spi {
-      100% { transform: rotate(360deg); }
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     /* Sidebar collapse on desktop */
@@ -5253,6 +5256,10 @@
         `;
         loginBtn.addEventListener('click', handleGoogleLogin);
         container.appendChild(loginBtn);
+        const driveHint = document.createElement('div');
+        driveHint.style.cssText = 'font-size:0.65rem;color:var(--text-dim);text-align:center;margin-top:8px;line-height:1.3;';
+        driveHint.textContent = 'Sign in to save chat history to Google Drive';
+        container.appendChild(driveHint);
       } else {
         const profileRow = document.createElement('div');
         profileRow.className = 'user-profile-row';
