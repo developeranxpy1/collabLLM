@@ -2406,6 +2406,82 @@
       }
     }
 
+    /* Premium Floating Undo Toast Bar */
+    #undoDeleteBar {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background-color: #121214;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 9999px; /* Symmetrical capsule */
+      padding: 6px 14px 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10000;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    #undoDeleteBar.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    #undoDeleteBar .undo-delete-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .undo-text-dim {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .undo-delete-btn {
+      background-color: #ffffff;
+      color: #09090b;
+      border: none;
+      border-radius: 9999px;
+      padding: 4px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .undo-delete-btn:hover {
+      background-color: #e4e4e7;
+      transform: scale(1.05);
+    }
+
+    .undo-delete-btn:active {
+      transform: scale(0.95);
+    }
+
+    @media (max-width: 768px) {
+      #undoDeleteBar {
+        bottom: 96px; /* Floating cleanly above the input area */
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        padding: 8px 16px;
+      }
+      #undoDeleteBar.show {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
     /* --- Mobile Toast Notification --- */
     .mobile-toast-container {
       position: fixed;
@@ -3676,6 +3752,12 @@
       </div>
     </aside>
 
+    <!-- Undo Delete Bar -->
+    <div id="undoDeleteBar">
+      <span class="undo-delete-label"></span>
+      <span class="undo-text-dim">deleted</span>
+      <button class="undo-delete-btn" onclick="undoDeleteChat()">Undo</button>
+    </div>
 
     <!-- Main Content Panel -->
     <main class="main-panel">
