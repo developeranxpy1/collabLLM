@@ -1785,7 +1785,7 @@
     }
 
     .modal-close-icon-btn {
-      align-self: flex-start;
+      align-self: center;
       background: none;
       border: none;
       color: var(--text-muted);
@@ -2096,7 +2096,7 @@
 
     .modal-button-ds {
       padding: 10px 24px;
-      border-radius: 99px; /* Premium capsule pill buttons */
+      border-radius: 99px;
       font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
@@ -2123,14 +2123,13 @@
     }
 
     .modal-button-ds.save {
-      background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+      background: var(--accent-blue);
       color: var(--accent-text, #ffffff);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
 
     .modal-button-ds.save:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      transform: translateY(-1px);
+      filter: brightness(1.15);
     }
 
     /* Premium Color Selection Visuals */
@@ -2537,6 +2536,8 @@
       }
       .modal-sidebar-tabs {
         flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
         overflow-x: auto;
         gap: 4px;
         flex: 1;
@@ -2547,19 +2548,17 @@
         display: none;
       }
       .modal-tab-btn {
-        padding: 7px 14px;
-        font-size: 0.75rem;
-        white-space: nowrap;
+        width: 34px;
+        height: 34px;
+        padding: 0;
         flex-shrink: 0;
-        border-radius: 999px;
+        border-radius: 50%;
         border: 1px solid transparent;
         background: none;
         color: var(--text-muted);
-        font-weight: 500;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
         transition: all 0.2s ease;
       }
       .modal-tab-btn i {
@@ -2642,20 +2641,17 @@
         font-size: 0.82rem;
         justify-content: center;
         border-radius: 12px;
+        background: none;
       }
       .modal-button-ds.save {
-        background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
-        color: var(--accent-text, #ffffff);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        color: var(--accent-blue);
         border: none;
       }
       .modal-button-ds.cancel {
-        background-color: var(--bg-pill);
         border: 1px solid var(--border-color);
         color: var(--text-muted);
       }
       .modal-button-ds.cancel:hover {
-        background-color: var(--bg-pill-hover);
         color: var(--text-main);
       }
       .modal-test-row {
@@ -4991,6 +4987,7 @@
     let _googleAccessToken = null;
     let _driveSyncTimer = null;
     let _driveSyncVersion = 0;
+    let _lastSyncTime = null;
 
     function initGoogleAuth() {
       if (typeof google === 'undefined') {
@@ -5080,6 +5077,7 @@
             { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: form });
         }
         if (showNotif) showNotification('Backup saved to Google Drive!');
+        _lastSyncTime = Date.now();
       } catch(e) {
         if (showNotif) showNotification('Drive sync failed: ' + (e.message || e));
       }
@@ -5405,7 +5403,6 @@
     let originalSettings = null;
 
     function displayModal() {
-      // Store current state for potential revert on Cancel
       originalSettings = JSON.parse(JSON.stringify(appState.settings));
       
       ui.settingsModal.classList.add('show');
@@ -5416,6 +5413,20 @@
       document.querySelectorAll('.modal-tab-content').forEach(content => {
         content.classList.toggle('active', content.id === 'tab-general');
       });
+
+      const backupSection = document.getElementById('backupSection');
+      if (backupSection) {
+        backupSection.style.display = appState.user ? '' : 'none';
+        if (appState.user) {
+          const statusEl = document.getElementById('driveSyncStatus');
+          if (statusEl && _lastSyncTime) {
+            const d = new Date(_lastSyncTime);
+            const opts = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+            statusEl.innerHTML = '<i data-lucide="check-circle" style="width:12px;height:12px;color:#10b981;"></i> Last sync: ' + d.toLocaleDateString(undefined, opts);
+            if (window.lucide) window.lucide.createIcons({ nodes: [statusEl] });
+          }
+        }
+      }
 
       runBackendPing(true);
     }
