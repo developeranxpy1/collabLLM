@@ -12,14 +12,13 @@
   <img src="https://img.shields.io/badge/Backend-Google_Colab-F9AB00?style=flat-square&logo=googlecolab&logoColor=white" alt="Backend">
   <img src="https://img.shields.io/badge/LLM-Uncensored-red?style=flat-square" alt="LLM">
   <img src="https://img.shields.io/badge/Cost-Free-brightgreen?style=flat-square" alt="Cost">
-  <img src="https://img.shields.io/badge/Utility-TUI_Uploader-cyan?style=flat-square" alt="Utility">
 </p>
 
 ---
 
 ## 🕒 Last Updated
 
-> **Thursday, May 28, 2026 at 11:50 AM IST**
+> **Thursday, May 28, 2026 at 12:00 PM IST**
 
 ---
 
@@ -149,29 +148,12 @@ collabLLM/
 │   └── literunner.py       # Backend LLM runner script
 ├── flowtoken/
 │   └── src/                # FlowToken animation library source
-├── forbidden/
-│   └── uploaderx.py        # GitHub one-click TUI uploader
 └── LibreChat/              # LibreChat integration files
 ```
 
 ---
 
-## 🚀 GitHub One-Click Uploader (TUI)
 
-A terminal-based utility to push your latest changes to GitHub in one step:
-
-```bash
-python forbidden/uploaderx.py
-```
-
-**Features:**
-- 🎨 ANSI-colored terminal output with status indicators
-- ⚡ One-key upload — press Enter to push, `q` to quit
-- 🔄 Auto-initializes git repo if needed
-- 🌿 Smart branch handling — tries `main`, falls back to `master`
-- 🔒 Token redaction in all error output
-
----
 
 ## 🧰 Tech Stack
 
