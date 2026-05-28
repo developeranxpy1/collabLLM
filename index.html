@@ -183,6 +183,7 @@
       display: flex;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       position: relative;
     }
 
@@ -2831,7 +2832,26 @@
 
     @media (max-width: 768px) {
       .collapsed-floating-pill {
-        display: none !important;
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        background-color: rgba(32, 32, 35, 0.72);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 9999px;
+        padding: 0 12px;
+        height: 40px;
+        box-sizing: border-box;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        position: absolute;
+        top: 6px;
+        left: 12px;
+        z-index: 150;
+      }
+      .mobile-menu-btn {
+        opacity: 0;
+        pointer-events: none;
       }
     }
 
@@ -4185,7 +4205,27 @@
             window._diLastExpandTime = Date.now();
           }
         });
+
+        // Collapse island if clicked outside
+        document.addEventListener('click', (e) => {
+          if (diContainer.classList.contains('active-click') && !diContainer.contains(e.target)) {
+            diContainer.classList.remove('active-click');
+          }
+        });
       }
+
+      // Pull to refresh on mobile
+      let _touchStartY = 0;
+      document.addEventListener('touchstart', (e) => {
+        _touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener('touchend', (e) => {
+        if (window.innerWidth <= 768 && (e.changedTouches[0].clientY - _touchStartY > 150)) {
+          if (ui.chatLogger.scrollTop <= 0) {
+            window.location.reload();
+          }
+        }
+      });
 
       // Dynamic Island Actions Wiring
       const diBtnSettings = document.getElementById('diBtnSettings');
@@ -5771,7 +5811,15 @@ appState.recognition.onresult = (evt) => {
 
       // Collapsed Floating Pill buttons
       document.getElementById('pillToggleSidebarBtn').addEventListener('click', () => {
-        ui.appLayout.classList.toggle('sidebar-collapsed');
+        if (window.innerWidth <= 768) {
+          if (ui.appLayout.classList.contains('sidebar-collapsed')) {
+            ui.appLayout.classList.remove('sidebar-collapsed');
+          } else {
+            ui.appLayout.classList.add('sidebar-drawer-open');
+          }
+        } else {
+          ui.appLayout.classList.toggle('sidebar-collapsed');
+        }
       });
       document.getElementById('pillSearchBtn').addEventListener('click', window.openSearchModal);
       document.getElementById('pillNewChatBtn').addEventListener('click', () => {
