@@ -2286,33 +2286,135 @@
       }
     }
 
+    /* --- Mobile Toast Notification --- */
+    .mobile-toast-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+      padding: 10px 16px 0;
+    }
+    .mobile-toast {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 15, 18, 0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 10px 18px;
+      min-width: 220px;
+      max-width: 92vw;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+      animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      font-family: var(--font-family);
+    }
+    .mobile-toast.show {
+      display: flex;
+    }
+    .mobile-toast.toast-exit {
+      animation: toastSlideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+    }
+    .mobile-toast-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .mobile-toast-icon i, .mobile-toast-icon svg {
+      width: 14px !important;
+      height: 14px !important;
+      color: #fff;
+    }
+    .mobile-toast-body {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+    .mobile-toast-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mobile-toast-sub {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.55);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mobile-toast-badge {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    @keyframes toastSlideIn {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes toastSlideOut {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-100%); opacity: 0; }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-toast-container {
+        display: none !important;
+      }
+    }
+
     @media (max-width: 600px) {
+      /* Force override inline styles on .modal-box */
       .modal-box {
-        flex-direction: column;
-        width: 100%;
-        height: 100dvh;
-        max-height: 100dvh;
-        border-radius: 0;
-        min-height: auto;
+        flex-direction: column !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        min-height: auto !important;
       }
       .modal-sidebar-ds {
         width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
-        padding: 12px 12px 8px;
+        padding: 10px 12px 8px;
         flex-direction: row;
         align-items: center;
         gap: 0;
+        flex-shrink: 0;
       }
       .modal-sidebar-ds > div:first-child {
         margin-bottom: 0;
-        margin-right: 12px;
+        margin-right: 10px;
+        flex-shrink: 0;
       }
       .modal-sidebar-tabs {
         flex-direction: row;
         overflow-x: auto;
         gap: 4px;
         flex: 1;
+        -webkit-overflow-scrolling: touch;
+      }
+      .modal-sidebar-tabs::-webkit-scrollbar {
+        display: none;
       }
       .modal-tab-btn {
         padding: 8px 12px;
@@ -2320,8 +2422,66 @@
         white-space: nowrap;
         flex-shrink: 0;
       }
+      .modal-tab-btn i {
+        width: 15px !important;
+        height: 15px !important;
+      }
       .modal-content-ds {
-        padding: 20px 16px;
+        padding: 18px 14px;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .content-header-badge {
+        margin-bottom: 16px;
+      }
+      .modal-footer-ds {
+        padding: 14px 0 0 0 !important;
+        margin-top: auto !important;
+        flex-shrink: 0;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: stretch;
+      }
+      .modal-button-ds {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 14px;
+        font-size: 0.82rem;
+        justify-content: center;
+      }
+      .modal-test-row {
+        flex-wrap: wrap;
+        gap: 8px !important;
+      }
+      .modal-test-btn {
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+        justify-content: center;
+        padding: 8px 10px !important;
+        font-size: 0.78rem;
+      }
+      .modal-test-status {
+        width: 100%;
+        text-align: center;
+        margin-left: 0 !important;
+        margin-top: 4px;
+      }
+      .modal-input-group {
+        gap: 6px;
+      }
+      .modal-field-ds {
+        font-size: 0.82rem;
+        padding: 10px;
+      }
+      .color-dot-selection {
+        gap: 8px !important;
+        margin-top: 10px;
+      }
+      .color-dot {
+        width: 26px !important;
+        height: 26px !important;
       }
       .search-modal-box {
         width: 100%;
@@ -2331,7 +2491,7 @@
         padding: 16px;
       }
       .backdrop-modal.show {
-        align-items: flex-end;
+        align-items: stretch;
       }
       .settings-row {
         flex-direction: column;
@@ -2435,9 +2595,10 @@
       }
       .di-container-ds {
         max-width: 120px;
-        top: 3px;
+        top: 48px;
         height: 22px;
         transform: translateX(-50%);
+        display: none; /* Hide dynamic island on mobile */
       }
       .di-container-ds:hover,
       .di-container-ds:focus-within,
@@ -2896,6 +3057,9 @@
     }
 
     @media (max-width: 768px) {
+      #dynamicIslandContainer {
+        display: none !important;
+      }
       .collapsed-floating-pill {
         display: flex !important;
         align-items: center;
@@ -3218,6 +3382,17 @@
   </style>
 </head>
 <body>
+  <!-- Mobile Toast Notification Container -->
+  <div class="mobile-toast-container" id="mobileToastContainer">
+    <div class="mobile-toast" id="mobileToast">
+      <div class="mobile-toast-icon" id="mobileToastIcon"></div>
+      <div class="mobile-toast-body">
+        <span class="mobile-toast-title" id="mobileToastTitle"></span>
+        <span class="mobile-toast-sub" id="mobileToastSub"></span>
+      </div>
+      <span class="mobile-toast-badge" id="mobileToastBadge"></span>
+    </div>
+  </div>
 
   <div class="app-layout" id="appLayout">
     <!-- Backdrop overlay for mobile drawer -->
@@ -3930,7 +4105,72 @@
     }
 
     // Dynamic Island State Updater
+    // --- Mobile Toast helper ---
+    window._mobileToastTimeout = null;
+    function showMobileToast(title, sub, type) {
+      const toast = document.getElementById('mobileToast');
+      const toastIcon = document.getElementById('mobileToastIcon');
+      const toastTitle = document.getElementById('mobileToastTitle');
+      const toastSub = document.getElementById('mobileToastSub');
+      const toastBadge = document.getElementById('mobileToastBadge');
+      if (!toast) return;
+
+      // Resolve colours/icon per type
+      const typeMap = {
+        connecting:  { icon: 'loader-2', color: '#f59e0b', badge: 'CONNECTING', bg: 'rgba(245,158,11,0.2)', spin: true },
+        online:      { icon: 'check-circle', color: '#10b981', badge: 'ONLINE', bg: 'rgba(16,185,129,0.2)' },
+        offline:     { icon: 'alert-triangle', color: '#ef4444', badge: 'OFFLINE', bg: 'rgba(239,68,68,0.2)' },
+        generating:  { icon: 'loader-2', color: 'var(--accent-blue)', badge: 'THINKING', bg: 'rgba(37,99,235,0.2)', spin: true },
+        speaking:    { icon: 'volume-2', color: '#a855f7', badge: 'SPEAKING', bg: 'rgba(168,85,247,0.2)' },
+        listening:   { icon: 'mic', color: '#f43f5e', badge: 'REC', bg: 'rgba(244,63,94,0.2)' },
+        success:     { icon: 'check-circle', color: '#10b981', badge: 'SUCCESS', bg: 'rgba(16,185,129,0.2)' },
+        error:       { icon: 'alert-circle', color: '#ef4444', badge: 'ERROR', bg: 'rgba(239,68,68,0.2)' },
+        warning:     { icon: 'alert-triangle', color: '#f59e0b', badge: 'WARNING', bg: 'rgba(245,158,11,0.2)' },
+        info:        { icon: 'info', color: 'var(--accent-blue)', badge: 'INFO', bg: 'rgba(60,111,240,0.2)' },
+        edit:        { icon: 'edit-3', color: '#3b82f6', badge: 'EDITING', bg: 'rgba(59,130,246,0.2)' },
+        delete:      { icon: 'trash-2', color: '#f43f5e', badge: 'DELETED', bg: 'rgba(244,63,94,0.2)' },
+        undo:        { icon: 'rotate-ccw', color: '#f59e0b', badge: 'UNDO', bg: 'rgba(245,158,11,0.2)' },
+        loading:     { icon: 'loader-2', color: '#6366f1', badge: 'LOADING', bg: 'rgba(99,102,241,0.2)', spin: true },
+        saving:      { icon: 'save', color: '#10b981', badge: 'SAVING', bg: 'rgba(16,185,129,0.2)' },
+      };
+      const t = typeMap[type] || typeMap.info;
+
+      toastIcon.style.backgroundColor = t.bg;
+      toastIcon.innerHTML = `<i data-lucide="${t.icon}" ${t.spin ? 'class="spin-loader"' : ''} style="width:14px;height:14px;color:#fff;"></i>`;
+      toastTitle.textContent = title;
+      toastSub.textContent = sub;
+      toastBadge.textContent = t.badge;
+      toastBadge.style.backgroundColor = t.bg;
+      toastBadge.style.color = t.color;
+
+      // Show
+      toast.classList.remove('toast-exit');
+      toast.classList.add('show');
+      if (window.lucide) window.lucide.createIcons({ nodes: [toastIcon] });
+
+      // Auto dismiss
+      if (window._mobileToastTimeout) clearTimeout(window._mobileToastTimeout);
+      window._mobileToastTimeout = setTimeout(() => {
+        toast.classList.add('toast-exit');
+        setTimeout(() => { toast.classList.remove('show', 'toast-exit'); }, 300);
+      }, 3500);
+    }
+
+    function isMobileViewport() {
+      return window.innerWidth <= 768;
+    }
+
     window.updateDynamicIsland = function(title, sub, type) {
+      // On mobile show a toast instead of the hidden Dynamic Island
+      if (isMobileViewport()) {
+        showMobileToast(title, sub, type);
+        // Still update internal state
+        window._diCurrentType = type;
+        window._diCurrentTitle = title;
+        window._diCurrentSub = sub;
+        return;
+      }
+
       const container = document.getElementById('dynamicIslandContainer');
       const tile = document.getElementById('diTile');
       const titleText = document.getElementById('diTitleText');
@@ -4335,24 +4575,42 @@
         appState.recognition.interimResults = true;
         appState.recognition.lang = 'en-US';
         let _finalTranscript = '';
+        let _shouldRestart = false; // flag to auto-restart on expected end
 
         appState.recognition.onstart = () => {
           const promptEl = ui.promptInput;
           _finalTranscript = (promptEl.textContent || promptEl.innerText || '').trim();
           if (_finalTranscript && !_finalTranscript.endsWith(' ')) _finalTranscript += ' ';
           appState.isRecording = true;
+          _shouldRestart = true;
           ui.voiceBtn.classList.add('recording');
           document.querySelector('.prompt-box-ds')?.classList.add('recording');
           window.updateDynamicIsland('Voice Dictation', 'Listening...', 'listening');
         };
 
         appState.recognition.onend = () => {
+          // On mobile, recognition can auto-stop after silence. Restart if user hasn't toggled off.
+          if (_shouldRestart && appState.isRecording) {
+            try { appState.recognition.start(); } catch(e) { /* already running */ }
+            return;
+          }
           appState.isRecording = false;
           ui.voiceBtn.classList.remove('recording');
           document.querySelector('.prompt-box-ds')?.classList.remove('recording');
           if (_finalTranscript) {
             ui.promptInput.textContent = _finalTranscript;
+            // Place cursor at end
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(ui.promptInput);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
             resizeInputArea(ui.promptInput);
+          }
+          // Enable send button if there's text
+          if (ui.sendBtn && _finalTranscript.trim()) {
+            ui.sendBtn.disabled = false;
           }
           window.updateDynamicIsland('collabLLM Ready', 'Dictation finished', 'online');
         };
@@ -4371,12 +4629,21 @@
           if (_finalTranscript || interim) {
             promptEl.textContent = _finalTranscript + (interim ? ' ' + interim : '');
             resizeInputArea(promptEl);
+            // Keep send btn enabled while dictating
+            if (ui.sendBtn) ui.sendBtn.disabled = false;
           }
         };
 
         appState.recognition.onerror = (evt) => {
+          // 'no-speech' and 'aborted' are recoverable — let onend handle restart
           if (evt.error === 'no-speech' || evt.error === 'aborted') return;
-          showNotification('Speech error or permission blocked.');
+          // 'not-allowed' means permission denied
+          if (evt.error === 'not-allowed' || evt.error === 'service-not-allowed') {
+            showNotification('Microphone permission denied. Please allow mic access.');
+          } else {
+            showNotification('Speech error: ' + evt.error);
+          }
+          _shouldRestart = false;
           appState.isRecording = false;
           ui.voiceBtn.classList.remove('recording');
           document.querySelector('.prompt-box-ds')?.classList.remove('recording');
@@ -5776,14 +6043,38 @@
 
       // Audio dictation transcription triggers
       ui.voiceBtn.addEventListener('click', () => {
-        if (!appState.recognition) return;
+        if (!appState.recognition) {
+          showNotification('Speech recognition is not supported in this browser.');
+          return;
+        }
         if (appState.isRecording) {
-          appState.recognition.stop();
+          // User is stopping — set flag so onend doesn't restart
+          window._speechShouldRestart = false;
+          // Access the internal restart flag via closure workaround
+          appState._shouldRestart = false;
+          appState.isRecording = false;
+          try { appState.recognition.stop(); } catch(e) {}
+          ui.voiceBtn.classList.remove('recording');
+          document.querySelector('.prompt-box-ds')?.classList.remove('recording');
         } else {
-          if (appState.speechSynth.speaking) {
+          if (appState.speechSynth && appState.speechSynth.speaking) {
             appState.speechSynth.cancel();
           }
-          appState.recognition.start();
+          try {
+            appState.recognition.start();
+          } catch(e) {
+            // If already started, stop first then restart
+            try {
+              appState.recognition.stop();
+              setTimeout(() => {
+                try { appState.recognition.start(); } catch(e2) {
+                  showNotification('Could not start voice input. Check microphone permissions.');
+                }
+              }, 200);
+            } catch(e2) {
+              showNotification('Could not start voice input. Check microphone permissions.');
+            }
+          }
         }
       });
 
