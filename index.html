@@ -2548,8 +2548,8 @@
         display: none;
       }
       .modal-tab-btn {
-        width: 34px;
-        height: 34px;
+        width: 38px;
+        height: 38px;
         padding: 0;
         flex-shrink: 0;
         border-radius: 50%;
@@ -2562,8 +2562,8 @@
         transition: all 0.2s ease;
       }
       .modal-tab-btn i {
-        width: 16px !important;
-        height: 16px !important;
+        width: 21px !important;
+        height: 21px !important;
         flex-shrink: 0;
       }
       .modal-tab-btn span {
@@ -3676,6 +3676,7 @@
       </div>
     </aside>
 
+
     <!-- Main Content Panel -->
     <main class="main-panel">
       <!-- Floating Pill when sidebar is collapsed -->
@@ -3848,15 +3849,15 @@
         
         <nav class="modal-sidebar-tabs">
           <button class="modal-tab-btn active" data-tab="general">
-            <i data-lucide="settings" style="width:18px;height:18px;"></i>
+            <i data-lucide="settings" style="width:24px;height:24px;"></i>
             <span>General</span>
           </button>
           <button class="modal-tab-btn" data-tab="customizations">
-            <i data-lucide="sparkles" style="width:18px;height:18px;"></i>
+            <i data-lucide="sparkles" style="width:24px;height:24px;"></i>
             <span>Animations</span>
           </button>
           <button class="modal-tab-btn" data-tab="advanced">
-            <i data-lucide="shield-check" style="width:18px;height:18px;"></i>
+            <i data-lucide="shield-check" style="width:24px;height:24px;"></i>
             <span>Advanced</span>
           </button>
         </nav>
@@ -5214,6 +5215,35 @@
 
     let activeAbortController = null;
     let isGenerating = false;
+    let promptQueue = [];
+    let queueIndicator = null;
+
+    function updateQueueIndicator() {
+      if (!queueIndicator) {
+        queueIndicator = document.createElement('div');
+        queueIndicator.id = 'queueIndicator';
+        queueIndicator.style.cssText = 'position:absolute;top:-6px;right:-6px;background:var(--accent-blue);color:#fff;font-size:0.6rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:10;';
+        const sendBtn = ui.sendBtn;
+        if (sendBtn && sendBtn.parentNode) {
+          sendBtn.style.position = 'relative';
+          sendBtn.parentNode.appendChild(queueIndicator);
+        }
+      }
+      queueIndicator.textContent = promptQueue.length || '';
+      queueIndicator.style.display = promptQueue.length ? 'flex' : 'none';
+    }
+
+    function processNextInQueue() {
+      if (promptQueue.length > 0 && !isGenerating) {
+        const next = promptQueue.shift();
+        updateQueueIndicator();
+        if (next && next.text) {
+          ui.promptInput.textContent = next.text;
+          resizeInputArea(ui.promptInput);
+          sendMessage();
+        }
+      }
+    }
 
     function resetSendButton() {
       isGenerating = false;
@@ -5652,6 +5682,11 @@
     }
 
     function removeChat(id) {
+      // Save deleted chat for possible undo
+      const deletedChat = appState.chats.find(c => c.id === id);
+      if (!deletedChat) return;
+      const deletedIndex = appState.chats.findIndex(c => c.id === id);
+
       appState.chats = appState.chats.filter(c => c.id !== id);
       localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
       debounceSyncToDrive();
@@ -5661,7 +5696,34 @@
         renderHistory();
         renderSessionNavigator();
       }
-      showNotification('Chat deleted.');
+
+      // Show undo bar
+      const undoBar = document.getElementById('undoDeleteBar');
+      if (undoBar) {
+        undoBar.querySelector('.undo-delete-label').textContent = deletedChat.title || 'Chat';
+        undoBar.classList.add('show');
+        clearTimeout(undoBar._undoTimer);
+        undoBar._undoTimer = setTimeout(() => {
+          undoBar.classList.remove('show');
+        }, 5000);
+        undoBar._deletedChat = deletedChat;
+        undoBar._deletedIndex = deletedIndex;
+      }
+    }
+
+    window.undoDeleteChat = function() {
+      const undoBar = document.getElementById('undoDeleteBar');
+      if (!undoBar || !undoBar._deletedChat) return;
+      clearTimeout(undoBar._undoTimer);
+      const chat = undoBar._deletedChat;
+      appState.chats.splice(undoBar._deletedIndex, 0, chat);
+      localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+      debounceSyncToDrive();
+      undoBar.classList.remove('show');
+      undoBar._deletedChat = null;
+      renderHistory();
+      renderSessionNavigator();
+      showNotification('✓ Chat restored.');
     }
 
     function renameChat(id) {
