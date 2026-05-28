@@ -344,6 +344,14 @@
       line-height: 1.4;
     }
 
+    .history-item-time {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+      line-height: 1.2;
+      margin-top: 1px;
+    }
+
     .history-more-btn {
       opacity: 0;
       color: var(--text-dim);
@@ -1134,50 +1142,59 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 16px;
-      background-color: #1a1a1c;
-      border-bottom: 1px solid var(--border-color);
+      padding: 6px 14px;
+      background: linear-gradient(135deg, rgba(26, 26, 32, 0.95), rgba(18, 18, 22, 0.98));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 10px 10px 0 0;
       font-family: var(--font-mono);
-      font-size: 0.72rem;
-      color: var(--text-muted);
+      font-size: 0.7rem;
+      color: var(--text-dim);
       position: sticky;
       top: 0;
       z-index: 10;
+      min-height: 38px;
+      box-sizing: border-box;
     }
 
     .code-block-header .code-lang {
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      color: #3b82f6;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: var(--accent-blue, #3b82f6);
+      background-color: var(--accent-blue-alpha, rgba(59, 130, 246, 0.1));
+      padding: 3px 8px;
+      border-radius: 6px;
       text-transform: uppercase;
+      font-size: 0.62rem;
+      border: 1px solid rgba(255, 255, 255, 0.02);
     }
 
     .code-block-actions {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     .code-block-actions button {
-      background: none;
-      border: 1px solid transparent;
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       color: var(--text-muted);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
+      gap: 5px;
+      padding: 4px 10px;
       border-radius: 6px;
       font-family: var(--font-family);
-      font-size: 0.72rem;
-      transition: all 0.15s ease;
+      font-size: 0.68rem;
+      font-weight: 500;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .code-block-actions button:hover {
-      background-color: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.08);
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
       color: var(--text-main);
+      transform: translateY(-0.5px);
     }
 
     .code-block-actions button:active {
@@ -1681,6 +1698,8 @@
 
     .prompt-box-ds.generating .ds-send-btn .send-icon { opacity: 0; }
     .prompt-box-ds.generating .ds-send-btn .wave-icon { opacity: 1; }
+    .prompt-box-ds.generating .ds-mic-btn,
+    .prompt-box-ds .ds-mic-btn { display: flex !important; }
 
     .waveform-svg {
       width: 16px;
@@ -2273,8 +2292,8 @@
         padding: 0 8px;
       }
       .greeting-area {
-        justify-content: flex-start;
-        padding: 90px 16px 140px;
+        justify-content: center;
+        padding: 20px 16px 80px;
       }
       .chat-logger {
         padding: 76px 14px 140px;
@@ -2497,16 +2516,24 @@
         width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
-        padding: 10px 12px 8px;
+        padding: 8px 10px;
         flex-direction: row;
         align-items: center;
-        gap: 0;
+        gap: 8px;
         flex-shrink: 0;
+        background: var(--bg-darkest);
       }
       .modal-sidebar-ds > div:first-child {
         margin-bottom: 0;
-        margin-right: 10px;
+        margin-right: 0;
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 2px 4px;
+        width: auto;
+        min-width: fit-content;
       }
       .modal-sidebar-tabs {
         flex-direction: row;
@@ -2514,43 +2541,122 @@
         gap: 4px;
         flex: 1;
         -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
       }
       .modal-sidebar-tabs::-webkit-scrollbar {
         display: none;
       }
       .modal-tab-btn {
-        padding: 8px 12px;
-        font-size: 0.78rem;
+        padding: 7px 14px;
+        font-size: 0.75rem;
         white-space: nowrap;
         flex-shrink: 0;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: none;
+        color: var(--text-muted);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s ease;
       }
       .modal-tab-btn i {
-        width: 15px !important;
-        height: 15px !important;
+        width: 16px !important;
+        height: 16px !important;
+        flex-shrink: 0;
+      }
+      .modal-tab-btn span {
+        display: none;
+      }
+      .modal-tab-btn:hover {
+        background-color: var(--bg-pill-hover);
+        color: var(--text-main);
+      }
+      .modal-tab-btn.active {
+        background-color: var(--accent-blue) !important;
+        color: var(--accent-text, #ffffff) !important;
+        font-weight: 600;
+        border-color: var(--accent-blue);
+      }
+      .modal-close-icon-btn {
+        padding: 4px;
+        margin-right: 2px;
       }
       .modal-content-ds {
-        padding: 18px 14px;
+        padding: 16px;
         flex: 1;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
       }
       .content-header-badge {
-        margin-bottom: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+      .content-header-badge::before {
+        content: '';
+        width: 16px;
+        height: 16px;
+        background: var(--accent-blue);
+        flex-shrink: 0;
+        mask-size: contain;
+        mask-repeat: no-repeat;
+        mask-position: center;
+        -webkit-mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+      }
+      #tab-general .content-header-badge::before {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E");
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E");
+      }
+      #tab-customizations .content-header-badge::before {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v12m0 0-3-3m3 3 3-3M5 15v4h14v-4'/%3E%3C/svg%3E");
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v12m0 0-3-3m3 3 3-3M5 15v4h14v-4'/%3E%3C/svg%3E");
+      }
+      #tab-advanced .content-header-badge::before {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E");
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E");
       }
       .modal-footer-ds {
-        padding: 14px 0 0 0 !important;
+        padding: 16px !important;
         margin-top: auto !important;
         flex-shrink: 0;
-        gap: 8px;
+        gap: 10px;
         flex-wrap: wrap;
         justify-content: stretch;
+        border-top: 1px solid var(--border-color);
+        background: var(--bg-darkest);
       }
       .modal-button-ds {
         flex: 1;
         min-width: 0;
-        padding: 10px 14px;
+        padding: 12px 14px;
         font-size: 0.82rem;
         justify-content: center;
+        border-radius: 12px;
+      }
+      .modal-button-ds.save {
+        background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-hover) 100%);
+        color: var(--accent-text, #ffffff);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        border: none;
+      }
+      .modal-button-ds.cancel {
+        background-color: var(--bg-pill);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+      }
+      .modal-button-ds.cancel:hover {
+        background-color: var(--bg-pill-hover);
+        color: var(--text-main);
       }
       .modal-test-row {
         flex-wrap: wrap;
@@ -2561,8 +2667,9 @@
         min-width: 0;
         text-align: center;
         justify-content: center;
-        padding: 8px 10px !important;
+        padding: 10px 10px !important;
         font-size: 0.78rem;
+        border-radius: 10px;
       }
       .modal-test-status {
         width: 100%;
@@ -2571,11 +2678,12 @@
         margin-top: 4px;
       }
       .modal-input-group {
-        gap: 6px;
+        gap: 8px;
       }
       .modal-field-ds {
         font-size: 0.82rem;
-        padding: 10px;
+        padding: 12px;
+        border-radius: 10px;
       }
       .color-dot-selection {
         gap: 8px !important;
@@ -2584,6 +2692,9 @@
       .color-dot {
         width: 26px !important;
         height: 26px !important;
+      }
+      .settings-rows-list {
+        gap: 16px;
       }
       .search-modal-box {
         width: 90%;
@@ -2605,6 +2716,10 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+        padding: 12px;
+        background: var(--bg-input);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
       }
       .settings-select-ds {
         width: 100%;
@@ -2645,8 +2760,8 @@
         height: 52px;
       }
       .greeting-area {
-        justify-content: flex-start;
-        padding: 80px 12px 100px;
+        justify-content: center;
+        padding: 20px 12px 70px;
       }
       .chat-logger {
         padding: 68px 10px 120px;
@@ -3852,6 +3967,13 @@
               <label class="modal-label-ds" for="systemPromptField">Global System Instructions</label>
               <textarea class="modal-field-ds" id="systemPromptField" rows="5" style="resize:none;" placeholder="Define the core persona and rules..."></textarea>
             </div>
+            <div class="modal-input-group" id="backupSection" style="border-top:1px solid var(--border-color);padding-top:16px;margin-top:8px;">
+              <label class="modal-label-ds">Google Drive Auto‑Sync</label>
+              <div class="settings-row-sub" style="margin-bottom:4px;">All chats and settings automatically sync to your Google Drive appData folder.</div>
+              <div style="font-size:0.7rem;color:var(--text-dim);display:flex;align-items:center;gap:6px;padding:6px 0;">
+                <span id="driveSyncStatus" style="display:flex;align-items:center;gap:4px;"><i data-lucide="check-circle" style="width:12px;height:12px;color:#10b981;"></i> Auto‑sync active</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -4679,29 +4801,28 @@
       }
 
       // Set speech recognition
-      const SpeechRegClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRegClass = window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition;
       if (SpeechRegClass) {
         appState.recognition = new SpeechRegClass();
         appState.recognition.continuous = true;
         appState.recognition.interimResults = true;
-        appState.recognition.lang = 'en-US';
+        appState.recognition.lang = navigator.language || 'en-US';
         let _finalTranscript = '';
-        let _shouldRestart = false; // flag to auto-restart on expected end
+        appState._shouldRestart = false;
 
         appState.recognition.onstart = () => {
           const promptEl = ui.promptInput;
           _finalTranscript = (promptEl.textContent || promptEl.innerText || '').trim();
           if (_finalTranscript && !_finalTranscript.endsWith(' ')) _finalTranscript += ' ';
           appState.isRecording = true;
-          _shouldRestart = true;
+          appState._shouldRestart = true;
           ui.voiceBtn.classList.add('recording');
           document.querySelector('.prompt-box-ds')?.classList.add('recording');
           window.updateDynamicIsland('Voice Dictation', 'Listening...', 'listening');
         };
 
         appState.recognition.onend = () => {
-          // On mobile, recognition can auto-stop after silence. Restart if user hasn't toggled off.
-          if (_shouldRestart && appState.isRecording) {
+          if (appState._shouldRestart && appState.isRecording) {
             try { appState.recognition.start(); } catch(e) { /* already running */ }
             return;
           }
@@ -4710,7 +4831,6 @@
           document.querySelector('.prompt-box-ds')?.classList.remove('recording');
           if (_finalTranscript) {
             ui.promptInput.textContent = _finalTranscript;
-            // Place cursor at end
             const range = document.createRange();
             const sel = window.getSelection();
             range.selectNodeContents(ui.promptInput);
@@ -4719,7 +4839,6 @@
             sel.addRange(range);
             resizeInputArea(ui.promptInput);
           }
-          // Enable send button if there's text
           if (ui.sendBtn && _finalTranscript.trim()) {
             ui.sendBtn.disabled = false;
           }
@@ -4740,21 +4859,18 @@
           if (_finalTranscript || interim) {
             promptEl.textContent = _finalTranscript + (interim ? ' ' + interim : '');
             resizeInputArea(promptEl);
-            // Keep send btn enabled while dictating
             if (ui.sendBtn) ui.sendBtn.disabled = false;
           }
         };
 
         appState.recognition.onerror = (evt) => {
-          // 'no-speech' and 'aborted' are recoverable — let onend handle restart
           if (evt.error === 'no-speech' || evt.error === 'aborted') return;
-          // 'not-allowed' means permission denied
           if (evt.error === 'not-allowed' || evt.error === 'service-not-allowed') {
             showNotification('Microphone permission denied. Please allow mic access.');
           } else {
             showNotification('Speech error: ' + evt.error);
           }
-          _shouldRestart = false;
+          appState._shouldRestart = false;
           appState.isRecording = false;
           ui.voiceBtn.classList.remove('recording');
           document.querySelector('.prompt-box-ds')?.classList.remove('recording');
@@ -4768,6 +4884,18 @@
       verifyBackendConnection();
       updatePillVisuals();
       lucide.createIcons();
+
+      // Fix mobile keyboard covering the prompt input
+      (function fixMobileKeyboard() {
+        const inputWrapper = document.querySelector('.input-wrapper-ds');
+        if (!window.visualViewport || !inputWrapper) return;
+        let vpHandler = () => {
+          const diff = window.innerHeight - window.visualViewport.height;
+          inputWrapper.style.bottom = diff > 50 ? diff + 'px' : '';
+        };
+        window.visualViewport.addEventListener('resize', vpHandler);
+        window.addEventListener('orientationchange', () => setTimeout(vpHandler, 300));
+      })();
     }
 
     function renderSessionNavigator() {
@@ -4860,6 +4988,9 @@
     }
 
     let googleTokenClient = null;
+    let _googleAccessToken = null;
+    let _driveSyncTimer = null;
+    let _driveSyncVersion = 0;
 
     function initGoogleAuth() {
       if (typeof google === 'undefined') {
@@ -4868,7 +4999,7 @@
       }
       googleTokenClient = google.accounts.oauth2.initTokenClient({
         client_id: '887244312260-dusovdpcp42sub6pjn76mlmuk4feci3n.apps.googleusercontent.com',
-        scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+        scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file',
         callback: (response) => {
           if (response.error) {
             console.error('Google Auth error:', response);
@@ -4876,6 +5007,7 @@
             return;
           }
           if (response.access_token) {
+            _googleAccessToken = response.access_token;
             showNotification('Retrieving Google profile...');
             fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
               headers: { Authorization: `Bearer ${response.access_token}` }
@@ -4890,6 +5022,8 @@
               localStorage.setItem('collabllm_user', JSON.stringify(appState.user));
               renderProfileFooter();
               showNotification(`Signed in as ${appState.user.name}`);
+              // After sign-in, try to fetch data from Drive
+              loadFromDrive(true);
             })
             .catch(err => {
               console.error('Failed to get userinfo:', err);
@@ -4898,6 +5032,113 @@
           }
         }
       });
+    }
+
+    function requestDriveToken() {
+      return new Promise((resolve, reject) => {
+        if (!appState.user) { reject('Not signed in'); return; }
+        if (!googleTokenClient) initGoogleAuth();
+        const client = google.accounts.oauth2.initTokenClient({
+          client_id: '887244312260-dusovdpcp42sub6pjn76mlmuk4feci3n.apps.googleusercontent.com',
+          scope: 'https://www.googleapis.com/auth/drive.file',
+          callback: (resp) => {
+            if (resp.access_token) { _googleAccessToken = resp.access_token; resolve(resp.access_token); }
+            else { reject(resp.error || 'No token'); }
+          }
+        });
+        client.requestAccessToken({ prompt: '' });
+      });
+    }
+
+    async function getDriveToken() {
+      if (_googleAccessToken) return _googleAccessToken;
+      return await requestDriveToken();
+    }
+
+    async function saveToDrive(showNotif) {
+      const token = await getDriveToken().catch(() => null);
+      if (!token) return;
+      if (showNotif) showNotification('Backing up to Google Drive...');
+      const data = { chats: appState.chats, settings: appState.settings, version: 1 };
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify({
+        name: 'collabllm_backup.json', mimeType: 'application/json', parents: ['appDataFolder']
+      })], { type: 'application/json' }));
+      form.append('file', blob);
+      try {
+        const search = await fetch(
+          'https://www.googleapis.com/drive/v3/files?q=name=%27collabllm_backup.json%27+and+%27appDataFolder%27+in+parents&fields=files(id,name)',
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const existing = await search.json();
+        if (existing.files && existing.files.length > 0) {
+          await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existing.files[0].id}?uploadType=multipart`, 
+            { method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: form });
+        } else {
+          await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', 
+            { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: form });
+        }
+        if (showNotif) showNotification('Backup saved to Google Drive!');
+      } catch(e) {
+        if (showNotif) showNotification('Drive sync failed: ' + (e.message || e));
+      }
+    }
+
+    async function loadFromDrive(showNotif) {
+      const token = await getDriveToken().catch(() => null);
+      if (!token) return;
+      try {
+        const search = await fetch(
+          'https://www.googleapis.com/drive/v3/files?q=name=%27collabllm_backup.json%27+and+%27appDataFolder%27+in+parents&fields=files(id,modifiedTime)',
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const result = await search.json();
+        if (!result.files || result.files.length === 0) {
+          if (showNotif) showNotification('No Drive backup found.');
+          return false;
+        }
+        const fileId = result.files[0].id;
+        const dl = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await dl.json();
+        if (!data || !data.chats) {
+          if (showNotif) showNotification('Drive backup is empty or corrupt.');
+          return false;
+        }
+        if (data.chats) appState.chats = data.chats;
+        if (data.settings) {
+          appState.settings = { ...appState.settings, ...data.settings };
+          localStorage.setItem('collabllm_settings', JSON.stringify(appState.settings));
+        }
+        localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+        renderHistory();
+        if (showNotif) showNotification('Restored from Google Drive!');
+        return true;
+      } catch(e) {
+        if (showNotif) showNotification('Drive restore failed: ' + (e.message || e));
+        return false;
+      }
+    }
+
+    function debounceSyncToDrive() {
+      if (!appState.user) return;
+      _driveSyncVersion++;
+      const version = _driveSyncVersion;
+      if (_driveSyncTimer) clearTimeout(_driveSyncTimer);
+      _driveSyncTimer = setTimeout(() => {
+        if (version !== _driveSyncVersion) return;
+        saveToDrive(false);
+      }, 3000);
+    }
+
+    async function backupToDrive() {
+      await saveToDrive(true);
+    }
+
+    async function restoreFromDrive() {
+      await loadFromDrive(true);
     }
 
     function handleGoogleLogin() {
@@ -5058,10 +5299,14 @@
             </div>
             <div class="colab-step-row">
               <div class="colab-step-number">2</div>
-              <div class="colab-step-content">Select <strong>Runtime → Run all</strong> (or press <code>Ctrl+F9</code>) inside the notebook to start the LLM server (select t4-gpu runtime from the left).</div>
+              <div class="colab-step-content">Select <strong>T4 GPU runtime</strong> from the left menu (Runtime → Change runtime type → T4 GPU).</div>
             </div>
             <div class="colab-step-row">
               <div class="colab-step-number">3</div>
+              <div class="colab-step-content">Select <strong>Runtime → Run all</strong> (or press <code>Ctrl+F9</code>) to start the LLM server.</div>
+            </div>
+            <div class="colab-step-row">
+              <div class="colab-step-number">4</div>
               <div class="colab-step-content">Copy the generated public server URL (ends with <code>.trycloudflare.com</code>) from the console, then <strong>paste it directly in the chat box</strong> below to auto-connect!</div>
             </div>
           </div>
@@ -5225,6 +5470,7 @@
 
       // accentColor is already in appState.settings because applyAccentColor updates it
       localStorage.setItem('collabllm_settings', JSON.stringify(appState.settings));
+      debounceSyncToDrive();
       hideModal();
       verifyBackendConnection();
       showNotification('Settings saved.');
@@ -5233,7 +5479,6 @@
     // Render History Chats inside Sidebar Grouped by Calendar
     function renderHistory() {
       ui.historyContainer.innerHTML = '';
-      // Remove any open context menus
       document.querySelectorAll('.history-context-menu').forEach(m => m.remove());
 
       if (appState.chats.length === 0) {
@@ -5245,30 +5490,33 @@
         return;
       }
 
-      // Group chats by time periods matching reference design
-      const now = Date.now();
-      const DAY = 24 * 60 * 60 * 1000;
-      const groups = {
-        'Today': [],
-        'Yesterday': [],
-        '7 Days': [],
-        '30 Days': [],
-        'Older': []
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const formatChatTime = (ts) => {
+        const d = new Date(ts);
+        const h = d.getHours();
+        const m = d.getMinutes();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 || 12;
+        return h12 + ':' + String(m).padStart(2, '0') + ' ' + ampm;
       };
 
+      const formatGroupDate = (ts) => {
+        const d = new Date(ts);
+        const chatDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        if (+chatDay === +today) return 'Today';
+        if (+chatDay === +yesterday) return 'Yesterday';
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+
+      const groups = {};
       appState.chats.forEach(chat => {
-        const diff = now - chat.timestamp;
-        if (diff < DAY) {
-          groups['Today'].push(chat);
-        } else if (diff < 2 * DAY) {
-          groups['Yesterday'].push(chat);
-        } else if (diff < 7 * DAY) {
-          groups['7 Days'].push(chat);
-        } else if (diff < 30 * DAY) {
-          groups['30 Days'].push(chat);
-        } else {
-          groups['Older'].push(chat);
-        }
+        const key = formatGroupDate(chat.timestamp);
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(chat);
       });
 
       const showContextMenu = (e, chatId) => {
@@ -5296,8 +5544,8 @@
           removeChat(chatId);
         });
 
-        menu.appendChild(renameBtn);
         menu.appendChild(deleteBtn);
+        menu.appendChild(renameBtn);
         document.body.appendChild(menu);
 
         // Position the menu near the button
@@ -5332,9 +5580,23 @@
             switchActiveChat(chat.id);
           });
 
+          const contentWrap = document.createElement('div');
+          contentWrap.style.cssText = 'display:flex;flex-direction:column;min-width:0;flex:1;';
+
           const label = document.createElement('span');
           label.className = 'history-item-label';
           label.textContent = chat.title;
+          label.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            renameChat(chat.id);
+          });
+
+          const timeLabel = document.createElement('span');
+          timeLabel.className = 'history-item-time';
+          timeLabel.textContent = formatChatTime(chat.timestamp);
+
+          contentWrap.appendChild(label);
+          contentWrap.appendChild(timeLabel);
 
           const moreBtn = document.createElement('button');
           moreBtn.className = 'history-more-btn';
@@ -5343,7 +5605,7 @@
             showContextMenu(e, chat.id);
           });
 
-          row.appendChild(label);
+          row.appendChild(contentWrap);
           row.appendChild(moreBtn);
           ui.historyContainer.appendChild(row);
         });
@@ -5381,6 +5643,7 @@
     function removeChat(id) {
       appState.chats = appState.chats.filter(c => c.id !== id);
       localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+      debounceSyncToDrive();
       if (appState.activeChatId === id) {
         startNewConversation();
       } else {
@@ -5402,6 +5665,7 @@
       }
       chat.title = trimmed;
       localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+      debounceSyncToDrive();
       renderHistory();
       renderSessionNavigator();
       if (appState.activeChatId === id) {
@@ -5662,6 +5926,7 @@
         appState.chats.unshift(chat);
         appState.activeChatId = chat.id;
         localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+        debounceSyncToDrive();
         renderHistory();
       } else {
         chat = appState.chats.find(c => c.id === appState.activeChatId);
@@ -5679,6 +5944,7 @@
         chat.messages = chat.messages.slice(0, idx);
         chat.messages.push({ role: 'user', content: text });
         localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+        debounceSyncToDrive();
         
         // Instantly re-render chat DOM and switch to it
         switchActiveChat(chat.id);
@@ -5834,6 +6100,12 @@
             const trimmed = line.trim();
             if (!trimmed) continue;
 
+            const _lid = liveToolBox.dataset.liveId;
+            const titleEl = liveToolBox.querySelector(`[data-live-title="${_lid}"]`);
+            const subEl = liveToolBox.querySelector(`[data-live-sub="${_lid}"]`);
+            const consoleEl = liveToolBox.querySelector(`[data-live-console="${_lid}"]`);
+            const badgeEl = liveToolBox.querySelector(`[data-live-badge="${_lid}"]`);
+
             if (trimmed.startsWith('data: ')) {
               const dataText = trimmed.slice(6);
               if (dataText === '[DONE]') break;
@@ -5847,26 +6119,82 @@
                     isFirstDelta = false;
                   }
                   outputContent += delta;
-                  
-                  // Parse target markdown into temp elements
+
+                  // --- Tool call detection & execution ---
+                  const toolCallRegex = /<\|tool_call\|>call:(\w+)\{([^}]*)\}<tool_call\|>/g;
+                  let toolCallMatch;
+                  let toolCallResolved = false;
+                  while ((toolCallMatch = toolCallRegex.exec(outputContent)) !== null) {
+                    toolCallResolved = true;
+                    const toolName = toolCallMatch[1];
+                    const toolArgs = toolCallMatch[2];
+                    liveToolBox.style.display = 'flex';
+                    _toolStepCount++;
+                    const logEntry = `▶ Tool: ${toolName}`;
+                    if (!logsTracker.includes(logEntry)) logsTracker.push(logEntry);
+                    if (consoleEl) {
+                      consoleEl.style.display = 'block';
+                      consoleEl.innerHTML = logsTracker.join('\n');
+                    }
+                    if (titleEl) titleEl.textContent = `Running: ${toolName}`;
+                    if (subEl) subEl.textContent = `Args: ${toolArgs}`;
+                    scrollToBottomSmart();
+                    // Execute the tool call via proxy
+                    (async () => {
+                      try {
+                        const execResp = await fetch(`${appState.settings.proxyUrl}/execute`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ command: toolArgs, tool: toolName })
+                        });
+                        const execResult = execResp.ok ? await execResp.text() : 'Execution failed: ' + execResp.status;
+                        logsTracker.push(`✓ ${toolName} completed`);
+                        if (consoleEl) {
+                          consoleEl.innerHTML = logsTracker.map(l => {
+                            if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+                            if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+                            if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
+                            return l;
+                          }).join('\n') + '\n' + execResult.slice(0, 500);
+                        }
+                        if (titleEl) titleEl.textContent = `${toolName} completed`;
+                        if (subEl) subEl.textContent = `Step ${_toolStepCount} completed`;
+                        scrollToBottomSmart();
+                      } catch(e) {
+                        logsTracker.push(`✗ ${toolName} error: ${e.message}`);
+                        if (consoleEl) {
+                          consoleEl.innerHTML = logsTracker.map(l => {
+                            if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+                            if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+                            if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
+                            return l;
+                          }).join('\n');
+                        }
+                        if (badgeEl) {
+                          badgeEl.className = 'sandbox-logs-badge error';
+                          badgeEl.innerHTML = '<i data-lucide="alert-circle" style="width:10px;height:10px;"></i> ERROR';
+                          if (window.lucide) window.lucide.createIcons({ nodes: [badgeEl] });
+                        }
+                        scrollToBottomSmart();
+                      }
+                    })();
+                  }
+                  if (toolCallResolved) {
+                    outputContent = outputContent.replace(toolCallRegex, '').trim();
+                  }
+                  // --- End tool call handling ---
+
                   const targetHtml = marked.parse(outputContent);
                   const tempDiv = document.createElement('div');
                   tempDiv.innerHTML = targetHtml;
-                  
-                  // Diff and update DOM incrementally at 60fps
                   diffAndUpdateDOM(bubble, tempDiv, appState.settings);
-                  
+                  if (window.lucide) window.lucide.createIcons({ nodes: [bubble] });
                   scrollToBottomSmart();
                 }
               } catch (e) {}
             } else if (trimmed.startsWith(': ')) {
               // Parse server keepalives representing tool steps
               const command = trimmed.slice(2);
-              const _lid = liveToolBox.dataset.liveId;
-              const titleEl = liveToolBox.querySelector(`[data-live-title="${_lid}"]`);
-              const subEl = liveToolBox.querySelector(`[data-live-sub="${_lid}"]`);
-              const consoleEl = liveToolBox.querySelector(`[data-live-console="${_lid}"]`);
-              const badgeEl = liveToolBox.querySelector(`[data-live-badge="${_lid}"]`);
               
               if (command.startsWith('tool-running-') || command.startsWith('tool-round-')) {
                 const actionName = command.replace('tool-running-', '').replace('tool-round-', 'Round ');
@@ -6000,7 +6328,10 @@
           <button class="bubble-utility-btn" onclick="regenerateResponse(${assistantIndex})"><i data-lucide="refresh-cw" style="width:12px;height:12px;"></i> Regenerate</button>
         `;
         wrapper.appendChild(utils);
-
+        
+        // Final Lucide createIcons on the whole wrapper to parse all message content & utility icons!
+        if (window.lucide) window.lucide.createIcons({ nodes: [wrapper] });
+ 
         // Save assistant content
         chat.messages.push({
           role: 'assistant',
@@ -6008,6 +6339,7 @@
           toolLogs: logsTracker.length > 0 ? logsTracker : null
         });
         localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+        debounceSyncToDrive();
         
         // Update step navigator
         renderSessionNavigator();
@@ -6036,6 +6368,7 @@
       // Truncate message history from this index onwards
       chat.messages = chat.messages.slice(0, idx);
       localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+      debounceSyncToDrive();
 
       // Re-render chat DOM elements instantly
       switchActiveChat(chat.id);
@@ -6285,13 +6618,10 @@
       // Audio dictation transcription triggers
       ui.voiceBtn.addEventListener('click', () => {
         if (!appState.recognition) {
-          showNotification('Speech recognition is not supported in this browser.');
+          showNotification('Speech recognition requires Chrome, Edge, or Opera. Quick voice input is not available in this browser.');
           return;
         }
         if (appState.isRecording) {
-          // User is stopping — set flag so onend doesn't restart
-          window._speechShouldRestart = false;
-          // Access the internal restart flag via closure workaround
           appState._shouldRestart = false;
           appState.isRecording = false;
           try { appState.recognition.stop(); } catch(e) {}
@@ -6304,7 +6634,6 @@
           try {
             appState.recognition.start();
           } catch(e) {
-            // If already started, stop first then restart
             try {
               appState.recognition.stop();
               setTimeout(() => {
