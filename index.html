@@ -195,7 +195,7 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      z-index: 100;
+      z-index: 1000;
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -2093,7 +2093,7 @@
         gap: 8px;
       }
       .di-container-ds {
-        transform: translateX(-50%) scale(0.85);
+        transform: translateX(-50%) scale(0.65);
         transform-origin: top center;
       }
       .sidebar {
@@ -2103,6 +2103,7 @@
         bottom: 0;
         transform: translateX(-100%);
         width: 280px;
+        z-index: 1000;
       }
       .app-layout.sidebar-drawer-open .sidebar {
         transform: translateX(0);
@@ -2114,7 +2115,7 @@
         width: 100vw;
         height: 100vh;
         background-color: rgba(0, 0, 0, 0.6);
-        z-index: 90;
+        z-index: 990;
         display: none;
       }
       .app-layout.sidebar-drawer-open .backdrop-overlay {
@@ -2387,6 +2388,7 @@
       .di-container-ds {
         top: 4px;
         height: 34px;
+        transform: translateX(-50%) scale(0.55);
       }
       .di-container-ds:hover,
       .di-container-ds:focus-within,
