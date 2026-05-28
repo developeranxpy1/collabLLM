@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>collabLLM – Advanced AI Search & Chat</title>
   <meta name="description" content="Premium search & chat interface for collabLLM.">
   <link rel="shortcut icon" href="/logo_round.png" type="image/png">
@@ -141,14 +141,19 @@
       padding: 0;
     }
 
-    body, html {
+    html {
       height: 100%;
+    }
+    body {
+      min-height: 100dvh;
       background-color: var(--bg-darkest);
       color: var(--text-main);
       font-family: var(--font-family);
       font-size: 14px;
       line-height: 1.5;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* Global scrollbars - visible over all elements */
@@ -181,10 +186,9 @@
 
     .app-layout {
       display: flex;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      position: relative;
+      position: fixed;
+      inset: 0;
+      overscroll-behavior: none;
     }
 
     .sidebar {
@@ -1328,7 +1332,7 @@
 
     /* Core Input Layout */
     .input-wrapper-ds {
-      padding: 16px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+      padding: 16px 20px 14px;
       display: flex;
       justify-content: center;
       background-color: rgba(19, 19, 20, 0.7); /* Transparent background */
@@ -2143,7 +2147,7 @@
         padding: 76px 14px 140px;
       }
       .input-wrapper-ds {
-        padding: 12px 12px calc(18px + env(safe-area-inset-bottom, 0px));
+        padding: 12px 12px 18px;
       }
       .prompt-box-ds {
         padding: 4px 4px 4px 14px;
@@ -2338,7 +2342,7 @@
         gap: 18px;
       }
       .input-wrapper-ds {
-        padding: 8px 8px calc(14px + env(safe-area-inset-bottom, 0px));
+        padding: 8px 8px 14px;
       }
       .prompt-box-ds {
         min-height: 42px;
