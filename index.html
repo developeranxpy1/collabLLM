@@ -2135,7 +2135,8 @@
         padding: 0 8px;
       }
       .greeting-area {
-        padding: 68px 16px 140px;
+        justify-content: flex-start;
+        padding: 90px 16px 140px;
       }
       .chat-logger {
         padding: 76px 14px 140px;
@@ -2327,7 +2328,8 @@
         height: 52px;
       }
       .greeting-area {
-        padding: 48px 12px 100px;
+        justify-content: flex-start;
+        padding: 80px 12px 100px;
       }
       .chat-logger {
         padding: 68px 10px 120px;
@@ -3870,7 +3872,11 @@
       let badgeHtml = '';
       let tileColor = 'var(--accent-blue)';
       
-      if (type === 'online') {
+      if (type === 'connecting') {
+        iconHtml = '<i data-lucide="loader-2" class="spin-loader" style="width:16px;height:16px;"></i>';
+        badgeHtml = '<span class="di-badge-ds" style="background-color: rgba(245, 158, 11, 0.2); color: #f59e0b;">CONNECTING</span>';
+        tileColor = '#f59e0b';
+      } else if (type === 'online') {
         iconHtml = '<i data-lucide="check-circle" style="width:16px;height:16px;"></i>';
         badgeHtml = '<span class="di-badge-ds">ONLINE</span>';
         tileColor = '#10b981';
@@ -4611,6 +4617,11 @@ appState.recognition.onresult = (evt) => {
           window.updateDynamicIsland('collabLLM Backend', 'Disconnected and offline', 'offline');
         }
         return false;
+      }
+
+      if (force) {
+        lastBackendState = 'connecting';
+        window.updateDynamicIsland('collabLLM Backend', 'Connecting to backend...', 'connecting');
       }
 
       const url = `${appState.settings.proxyUrl}/health`;
