@@ -1,0 +1,7 @@
+# Local environment and secrets
+forbidden/
+.env
+.env.*
+node_modules/
+.DS_Store
+Thumbs.db
