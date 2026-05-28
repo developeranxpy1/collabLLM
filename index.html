@@ -1247,16 +1247,21 @@
 
     /* Tool Sandbox logs with Blur */
     .sandbox-logs-box {
-      background-color: var(--accent-blue-alpha);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border: 1px solid var(--accent-blue-alpha);
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin-bottom: 10px;
+      background: linear-gradient(135deg, rgba(30, 30, 38, 0.65), rgba(20, 20, 26, 0.8));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 0;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sandbox-logs-box.live {
+      border-color: var(--accent-blue-alpha);
+      box-shadow: 0 0 16px rgba(60, 111, 240, 0.08);
     }
 
     .sandbox-logs-header {
@@ -1266,37 +1271,134 @@
       font-size: 0.75rem;
       font-weight: 600;
       color: var(--text-main);
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s ease;
+    }
+    .sandbox-logs-header:hover {
+      background-color: rgba(255, 255, 255, 0.03);
     }
 
     .sandbox-logs-title {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+    }
+    .sandbox-logs-title-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .sandbox-logs-title-main {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .sandbox-logs-title-sub {
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    .sandbox-logs-badge {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .sandbox-logs-badge.running {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+    }
+    .sandbox-logs-badge.done {
+      background-color: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+    }
+    .sandbox-logs-badge.error {
+      background-color: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+    }
+
+    .sandbox-logs-chevron {
+      transition: transform 0.25s ease;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+    .sandbox-logs-box.collapsed .sandbox-logs-chevron {
+      transform: rotate(-90deg);
+    }
+    .sandbox-logs-box.collapsed .sandbox-logs-console {
+      max-height: 0 !important;
+      padding: 0 12px !important;
+      opacity: 0;
     }
 
     .sandbox-logs-console {
       font-family: var(--font-mono);
       font-size: 0.7rem;
-      background-color: #0e0e10;
-      padding: 6px 8px;
-      border-radius: 4px;
+      background-color: rgba(8, 8, 12, 0.6);
+      padding: 10px 12px;
+      margin: 0 10px 10px;
+      border-radius: 8px;
       color: var(--text-muted);
       overflow-x: auto;
-      max-height: 120px;
+      overflow-y: auto;
+      max-height: 200px;
       white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.55;
+      transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+    }
+    .sandbox-logs-console::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sandbox-logs-console::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    .sandbox-log-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 3px 0;
+    }
+    .sandbox-log-step .step-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .sandbox-log-step .step-icon.running { color: #f59e0b; }
+    .sandbox-log-step .step-icon.done    { color: #10b981; }
+    .sandbox-log-step .step-icon.error   { color: #ef4444; }
+    .sandbox-log-step .step-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .sandbox-log-step .step-time {
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .msg-utility-actions {
       display: flex;
       gap: 8px;
       margin-top: 8px;
-      opacity: 0; /* Hidden by default for clean visual design */
-      pointer-events: none;
+      opacity: 1; /* Always visible */
+      pointer-events: auto;
       transition: opacity 0.2s ease;
     }
 
     .msg-row:hover .msg-utility-actions {
-      opacity: 1; /* Fade-in beautifully on message row hover */
+      opacity: 1;
       pointer-events: auto;
     }
 
@@ -2484,14 +2586,20 @@
         height: 26px !important;
       }
       .search-modal-box {
-        width: 100%;
-        height: 100dvh;
-        max-height: 100dvh;
-        border-radius: 0;
-        padding: 16px;
+        width: 90%;
+        max-width: 500px;
+        height: 520px;
+        max-height: 80dvh;
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        padding: 24px;
       }
       .backdrop-modal.show {
         align-items: stretch;
+      }
+      #searchModal.backdrop-modal.show {
+        align-items: center;
+        justify-content: center;
       }
       .settings-row {
         flex-direction: column;
@@ -2697,6 +2805,9 @@
       .bubble-utility-btn {
         font-size: 0.68rem;
         padding: 3px 6px;
+      }
+      .collapsed-floating-pill {
+        top: 4px !important;
       }
     }
 
@@ -3191,7 +3302,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
+      color: var(--accent-text, #ffffff);
       flex-shrink: 0;
       transition: all 0.3s ease;
     }
@@ -3423,7 +3534,7 @@
       </div>
 
       <div class="sidebar-search-box" id="sidebarSearchBox" style="display:none;">
-        <input type="text" class="sidebar-search-input" id="sidebarSearchInput" placeholder="Search conversations..." autocomplete="off">
+        <input type="search" class="sidebar-search-input" id="sidebarSearchInput" placeholder="Search conversations..." autocomplete="off" spellcheck="false">
       </div>
 
       <!-- History listing grouped by dates -->
@@ -3769,7 +3880,7 @@
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
         <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
           <i data-lucide="search" style="width: 18px; height: 18px; color: var(--text-muted);"></i>
-          <input type="text" id="modalSearchInput" placeholder="Search chats..." style="background: none; border: none; outline: none; color: var(--text-main); font-size: 1.1rem; width: 100%; font-family: var(--font-family);" autocomplete="off">
+          <input type="search" id="modalSearchInput" placeholder="Search chats..." style="background: none; border: none; outline: none; color: var(--text-main); font-size: 1.1rem; width: 100%; font-family: var(--font-family);" autocomplete="off" spellcheck="false">
         </div>
         <button class="modal-close-icon-btn" id="searchModalCloseBtn"><i data-lucide="x"></i></button>
       </div>
@@ -4947,7 +5058,7 @@
             </div>
             <div class="colab-step-row">
               <div class="colab-step-number">2</div>
-              <div class="colab-step-content">Select <strong>Runtime → Run all</strong> (or press <code>Ctrl+F9</code>) inside the notebook to start the LLM server.</div>
+              <div class="colab-step-content">Select <strong>Runtime → Run all</strong> (or press <code>Ctrl+F9</code>) inside the notebook to start the LLM server (select t4-gpu runtime from the left).</div>
             </div>
             <div class="colab-step-row">
               <div class="colab-step-number">3</div>
@@ -4962,14 +5073,9 @@
           alertContainer.style.display = 'none';
           alertContainer.innerHTML = '';
         } else {
-          if (appState.activeChatId) {
-            alertContainer.style.display = 'flex';
-            if (!alertContainer.innerHTML) {
-              alertContainer.innerHTML = cardHtml;
-            }
-          } else {
-            alertContainer.style.display = 'none';
-            alertContainer.innerHTML = '';
+          alertContainer.style.display = 'flex';
+          if (!alertContainer.innerHTML.includes('colab-instructions-card')) {
+            alertContainer.innerHTML = cardHtml;
           }
         }
       }
@@ -5173,6 +5279,14 @@
         const menu = document.createElement('div');
         menu.className = 'history-context-menu';
 
+        const renameBtn = document.createElement('button');
+        renameBtn.innerHTML = '<i data-lucide="edit-3" style="width:13px;height:13px;"></i> Rename';
+        renameBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          menu.remove();
+          renameChat(chatId);
+        });
+
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'danger';
         deleteBtn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i> Delete';
@@ -5182,6 +5296,7 @@
           removeChat(chatId);
         });
 
+        menu.appendChild(renameBtn);
         menu.appendChild(deleteBtn);
         document.body.appendChild(menu);
 
@@ -5275,6 +5390,27 @@
       showNotification('Chat deleted.');
     }
 
+    function renameChat(id) {
+      const chat = appState.chats.find(c => c.id === id);
+      if (!chat) return;
+      const newTitle = prompt('Rename Chat', chat.title);
+      if (newTitle === null) return;
+      const trimmed = newTitle.trim();
+      if (!trimmed) {
+        showNotification('Title cannot be empty.', 'error');
+        return;
+      }
+      chat.title = trimmed;
+      localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
+      renderHistory();
+      renderSessionNavigator();
+      if (appState.activeChatId === id) {
+        const titleTextEl = document.getElementById('navChatTitleText');
+        if (titleTextEl) titleTextEl.textContent = trimmed;
+      }
+      showNotification('Chat renamed.');
+    }
+
     function startNewConversation() {
       appState.activeChatId = null;
       document.querySelectorAll('.history-item').forEach(el => el.classList.remove('active'));
@@ -5326,15 +5462,32 @@
       const wrapper = document.createElement('div');
       wrapper.className = 'msg-body-wrapper';
 
+      // Build tool logs HTML for saved messages
       let logsHtml = '';
       if (role === 'assistant' && toolLogs && toolLogs.length > 0) {
+        const hasError = toolLogs.some(l => l.startsWith('✗'));
+        const coloredLogs = toolLogs.map(l => {
+          if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+          if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+          if (l.startsWith('▶')) return `<span style="color:var(--text-muted)">${l}</span>`;
+          return `<span style="color:var(--text-dim)">${l}</span>`;
+        }).join('\n');
         logsHtml = `
-          <div class="sandbox-logs-box">
+          <div class="sandbox-logs-box collapsed" onclick="this.classList.toggle('collapsed')" style="cursor:pointer;">
             <div class="sandbox-logs-header">
-              <span class="sandbox-logs-title"><i data-lucide="terminal" style="width:12px;height:12px;color:var(--accent-blue);"></i> Sandbox Actions</span>
-              <span style="font-size:0.65rem;color:var(--accent-blue);font-weight:bold;">EXECUTED</span>
+              <span class="sandbox-logs-title">
+                <i data-lucide="terminal" style="width:14px;height:14px;color:${hasError ? '#ef4444' : 'var(--accent-blue)'};"></i>
+                <span class="sandbox-logs-title-text">
+                  <span class="sandbox-logs-title-main">Sandbox Actions · ${toolLogs.length} step${toolLogs.length !== 1 ? 's' : ''}</span>
+                  <span class="sandbox-logs-title-sub">Click to ${hasError ? 'view errors' : 'expand'}</span>
+                </span>
+              </span>
+              <span style="display:flex;align-items:center;gap:6px;">
+                <span class="sandbox-logs-badge ${hasError ? 'error' : 'done'}">${hasError ? '<i data-lucide="alert-circle" style="width:10px;height:10px;"></i> ERRORS' : '<i data-lucide="check-circle" style="width:10px;height:10px;"></i> DONE'}</span>
+                <i data-lucide="chevron-down" class="sandbox-logs-chevron" style="width:14px;height:14px;"></i>
+              </span>
             </div>
-            <div class="sandbox-logs-console">${toolLogs.join('\n')}</div>
+            <div class="sandbox-logs-console">${coloredLogs}</div>
           </div>
         `;
       }
@@ -5579,20 +5732,31 @@
       const wrapper = document.createElement('div');
       wrapper.className = 'msg-body-wrapper';
 
-      // Inline live logs panel for tools
+      // Inline live logs panel for tools (scoped IDs to avoid collision)
+      const liveId = 'live-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
       const liveToolBox = document.createElement('div');
-      liveToolBox.className = 'sandbox-logs-box';
+      liveToolBox.className = 'sandbox-logs-box live';
       liveToolBox.style.display = 'none';
       liveToolBox.innerHTML = `
-        <div class="sandbox-logs-header">
+        <div class="sandbox-logs-header" onclick="this.parentElement.classList.toggle('collapsed')">
           <span class="sandbox-logs-title">
-            <i data-lucide="loader-2" class="spin-loader" style="width:12px;height:12px;color:var(--accent-blue);"></i>
-            <span id="live-action-title">Contacting Collab Sandbox...</span>
+            <i data-lucide="loader-2" class="spin-loader" style="width:14px;height:14px;color:var(--accent-blue);"></i>
+            <span class="sandbox-logs-title-text">
+              <span class="sandbox-logs-title-main" data-live-title="${liveId}">Contacting Collab Sandbox...</span>
+              <span class="sandbox-logs-title-sub" data-live-sub="${liveId}">Initializing agent core</span>
+            </span>
           </span>
-          <span style="font-size:0.65rem;color:var(--accent-blue);font-weight:bold;">AGENT CORE</span>
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span class="sandbox-logs-badge running" data-live-badge="${liveId}"><i data-lucide="loader-2" class="spin-loader" style="width:10px;height:10px;"></i> RUNNING</span>
+            <i data-lucide="chevron-down" class="sandbox-logs-chevron" style="width:14px;height:14px;"></i>
+          </span>
         </div>
-        <div class="sandbox-logs-console" id="live-action-console" style="display:none;"></div>
+        <div class="sandbox-logs-console" data-live-console="${liveId}"></div>
       `;
+      // Store the scoped ID for later reference
+      liveToolBox.dataset.liveId = liveId;
+      let _toolStartTime = Date.now();
+      let _toolStepCount = 0;
 
       const bubble = document.createElement('div');
       bubble.className = 'msg-bubble md-body';
@@ -5698,27 +5862,79 @@
             } else if (trimmed.startsWith(': ')) {
               // Parse server keepalives representing tool steps
               const command = trimmed.slice(2);
+              const _lid = liveToolBox.dataset.liveId;
+              const titleEl = liveToolBox.querySelector(`[data-live-title="${_lid}"]`);
+              const subEl = liveToolBox.querySelector(`[data-live-sub="${_lid}"]`);
+              const consoleEl = liveToolBox.querySelector(`[data-live-console="${_lid}"]`);
+              const badgeEl = liveToolBox.querySelector(`[data-live-badge="${_lid}"]`);
               
               if (command.startsWith('tool-running-') || command.startsWith('tool-round-')) {
                 const actionName = command.replace('tool-running-', '').replace('tool-round-', 'Round ');
+                _toolStepCount++;
                 liveToolBox.style.display = 'flex';
-                document.getElementById('live-action-title').textContent = `Running Tool: ${actionName}...`;
+                if (titleEl) titleEl.textContent = `Running: ${actionName}`;
+                if (subEl) subEl.textContent = `Step ${_toolStepCount} · ${((Date.now() - _toolStartTime) / 1000).toFixed(1)}s elapsed`;
                 
-                const logLabel = `[Tool Executing: ${actionName}]`;
-                if (!logsTracker.includes(logLabel)) {
-                  logsTracker.push(logLabel);
-                  const consoleBox = document.getElementById('live-action-console');
-                  consoleBox.style.display = 'block';
-                  consoleBox.textContent = logsTracker.join('\n');
+                const logEntry = `▶ ${actionName}`;
+                if (!logsTracker.includes(logEntry)) {
+                  logsTracker.push(logEntry);
+                  if (consoleEl) {
+                    consoleEl.style.display = 'block';
+                    consoleEl.innerHTML = logsTracker.map(l => {
+                      if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+                      if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+                      if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
+                      return l;
+                    }).join('\n');
+                  }
                 }
                 scrollToBottomSmart();
               } else if (command.startsWith('tool-complete-')) {
                 const blockId = command.replace('tool-complete-', '');
-                logsTracker.push(`[Tool Done: ${blockId}]`);
-                const consoleBox = document.getElementById('live-action-console');
-                consoleBox.style.display = 'block';
-                consoleBox.textContent = logsTracker.join('\n');
-                document.getElementById('live-action-title').textContent = 'Analyzing results...';
+                logsTracker.push(`✓ ${blockId} completed`);
+                if (consoleEl) {
+                  consoleEl.style.display = 'block';
+                  consoleEl.innerHTML = logsTracker.map(l => {
+                    if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+                    if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+                    if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
+                    return l;
+                  }).join('\n');
+                }
+                if (titleEl) titleEl.textContent = 'Analyzing results...';
+                if (subEl) subEl.textContent = `${_toolStepCount} steps · ${((Date.now() - _toolStartTime) / 1000).toFixed(1)}s elapsed`;
+                scrollToBottomSmart();
+              } else if (command.startsWith('tool-error-')) {
+                const errorMsg = command.replace('tool-error-', '');
+                logsTracker.push(`✗ Error: ${errorMsg}`);
+                if (consoleEl) {
+                  consoleEl.style.display = 'block';
+                  consoleEl.innerHTML = logsTracker.map(l => {
+                    if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+                    if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+                    if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
+                    return l;
+                  }).join('\n');
+                }
+                if (titleEl) titleEl.textContent = 'Tool encountered an error';
+                if (badgeEl) {
+                  badgeEl.className = 'sandbox-logs-badge error';
+                  badgeEl.innerHTML = '<i data-lucide="alert-circle" style="width:10px;height:10px;"></i> ERROR';
+                  if (window.lucide) window.lucide.createIcons({ nodes: [badgeEl] });
+                }
+                scrollToBottomSmart();
+              } else if (command.startsWith('tool-output-')) {
+                const outputLine = command.replace('tool-output-', '');
+                logsTracker.push(`  ${outputLine}`);
+                if (consoleEl) {
+                  consoleEl.style.display = 'block';
+                  consoleEl.innerHTML = logsTracker.map(l => {
+                    if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+                    if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+                    if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
+                    return l;
+                  }).join('\n');
+                }
                 scrollToBottomSmart();
               }
             }
@@ -5733,8 +5949,47 @@
         // Finalize FlowBubble by stripping classes and animations
         finalizeFlowBubble(bubble);
 
-        // Hide live tracker
-        liveToolBox.style.display = 'none';
+        // Transition live tracker to finalized state
+        if (logsTracker.length > 0) {
+          const totalTime = ((Date.now() - _toolStartTime) / 1000).toFixed(1);
+          const hasError = logsTracker.some(l => l.startsWith('✗'));
+          liveToolBox.classList.remove('live');
+          // Update header to finalized state
+          const _lid = liveToolBox.dataset.liveId;
+          const titleEl = liveToolBox.querySelector(`[data-live-title="${_lid}"]`);
+          const subEl = liveToolBox.querySelector(`[data-live-sub="${_lid}"]`);
+          const badgeEl = liveToolBox.querySelector(`[data-live-badge="${_lid}"]`);
+          const headerIcon = liveToolBox.querySelector('.sandbox-logs-title > i');
+
+          if (titleEl) titleEl.textContent = `Sandbox Actions · ${_toolStepCount} step${_toolStepCount !== 1 ? 's' : ''}`;
+          if (subEl) subEl.textContent = `Completed in ${totalTime}s`;
+          if (headerIcon) {
+            headerIcon.classList.remove('spin-loader');
+            headerIcon.setAttribute('data-lucide', hasError ? 'alert-circle' : 'terminal');
+            headerIcon.style.color = hasError ? '#ef4444' : 'var(--accent-blue)';
+          }
+          if (badgeEl) {
+            badgeEl.className = `sandbox-logs-badge ${hasError ? 'error' : 'done'}`;
+            badgeEl.innerHTML = hasError
+              ? '<i data-lucide="alert-circle" style="width:10px;height:10px;"></i> ERRORS'
+              : '<i data-lucide="check-circle" style="width:10px;height:10px;"></i> DONE';
+          }
+          // Render final colored logs
+          const consoleEl = liveToolBox.querySelector(`[data-live-console="${_lid}"]`);
+          if (consoleEl) {
+            consoleEl.innerHTML = logsTracker.map(l => {
+              if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+              if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+              if (l.startsWith('▶')) return `<span style="color:var(--text-muted)">${l}</span>`;
+              return `<span style="color:var(--text-dim)">${l}</span>`;
+            }).join('\n');
+          }
+          // Start collapsed for finalized logs
+          liveToolBox.classList.add('collapsed');
+          if (window.lucide) window.lucide.createIcons({ nodes: [liveToolBox] });
+        } else {
+          liveToolBox.style.display = 'none';
+        }
 
         // Add action buttons with Speak, Copy, and Regenerate
         const utils = document.createElement('div');
@@ -5745,20 +6000,6 @@
           <button class="bubble-utility-btn" onclick="regenerateResponse(${assistantIndex})"><i data-lucide="refresh-cw" style="width:12px;height:12px;"></i> Regenerate</button>
         `;
         wrapper.appendChild(utils);
-
-        // Prepend completed logs
-        if (logsTracker.length > 0) {
-          const finishedLogsHtml = `
-            <div class="sandbox-logs-box">
-              <div class="sandbox-logs-header">
-                <span class="sandbox-logs-title"><i data-lucide="terminal" style="width:12px;height:12px;color:var(--accent-blue);"></i> Sandbox Actions</span>
-                <span style="font-size:0.65rem;color:var(--accent-blue);font-weight:bold;">EXECUTED</span>
-              </div>
-              <div class="sandbox-logs-console">${logsTracker.join('\n')}</div>
-            </div>
-          `;
-          bubble.insertAdjacentHTML('afterbegin', finishedLogsHtml);
-        }
 
         // Save assistant content
         chat.messages.push({
