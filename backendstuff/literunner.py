@@ -1,3 +1,35 @@
+
+
+
+
+
+# Cold Start Notice
+
+# Preparing the GPU VM, compiling packages,
+# and downloading uncensored model weights usually takes 5 minutes or more.
+#  Please wait for the printed /v1 link to appear in your Colab output
+#   before connecting
+
+# Run the cells and wait for the backend link.
+
+
+# then paste the link in the text box and enter
+
+
+
+
+
+
+#   !!!!!!!!!!!!!!!!!  scroll down to the end and wait for the link !!!!!!!!!!!!!!!
+
+
+
+
+
+
+
+
+
 import os, subprocess as sp, time, sys, json, random, base64 as b64, socket, re, urllib.request as ur, datetime, textwrap
 
 # --- CONFIG ---
@@ -170,6 +202,9 @@ def init_ai():
             "fetch": "fetch_url",
             "read_url": "fetch_url",
             "web_search": "search_web",
+            "code": "execute_code",
+            "call_tool_chain": "execute_code",
+            "codemode": "execute_code",
         }
 
         EXECUTE_TOOL = {
@@ -287,12 +322,45 @@ def init_ai():
             }
         }
 
+        EXECUTE_CODE_TOOL = {
+            "type": "function",
+            "function": {
+                "name": "execute_code",
+                "description": (
+                    "Execute Python code in a sandboxed environment with access to tool interfaces. "
+                    "Use this for code-mode / UTCP-style multi-step tool chains. "
+                    "The environment exposes 'tools' as a dict of async callable interfaces for: "
+                    "execute_terminal, search_web, fetch_url, execute_python_code, list_directory_contents. "
+                    "Call them like: result = await tools['execute_terminal']({'command': 'ls'}). "
+                    "The sandbox has async/await support and returns stdout + stderr. "
+                    "Always use print() to output results you want returned."
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "code": {
+                            "type": "string",
+                            "description": "Python code to execute. Supports async/await. Use tools['tool_name'] to call tools."
+                        },
+                        "timeout": {
+                            "type": "integer",
+                            "description": "Execution timeout in seconds (default 60, max 300).",
+                            "minimum": 1,
+                            "maximum": 300
+                        }
+                    },
+                    "required": ["code"]
+                }
+            }
+        }
+
         SUPPORTED_TOOLS = {
             "execute_terminal": EXECUTE_TOOL,
             "search_web": SEARCH_TOOL,
             "fetch_url": FETCH_TOOL,
             "execute_python_code": PYTHON_TOOL,
             "list_directory_contents": DIR_LIST_TOOL,
+            "execute_code": EXECUTE_CODE_TOOL,
         }
         SUPPORTED_TOOL_NAMES = tuple(SUPPORTED_TOOLS.keys())
 
@@ -446,6 +514,115 @@ def init_ai():
                 return "\n".join(lines)
             except Exception as e:
                 return f"Error listing directory '{path}': {e}"
+
+        async def run_execute_code(code, timeout=60):
+            code = str(code or "").strip()
+            if not code:
+                return {"ok": False, "exit_code": -1, "stdout": "", "stderr": "Missing code.", "output": "Missing code.", "timed_out": False}
+            loop = asyncio.get_running_loop()
+            def _run():
+                try:
+                    import io, contextlib, json, asyncio
+                    safe_builtins = {
+                        "abs": abs, "all": all, "any": any, "bool": bool, "dict": dict,
+                        "divmod": divmod, "enumerate": enumerate, "filter": filter, "float": float,
+                        "int": int, "len": len, "list": list, "map": map, "max": max, "min": min,
+                        "pow": pow, "print": print, "range": range, "repr": repr, "reversed": reversed,
+                        "round": round, "set": set, "sorted": sorted, "str": str, "sum": sum,
+                        "tuple": tuple, "zip": zip, "isinstance": isinstance, "type": type,
+                        "True": True, "False": False, "None": None, "object": object,
+                        "Exception": Exception, "ValueError": ValueError, "TypeError": TypeError,
+                        "KeyError": KeyError, "IndexError": IndexError, "AttributeError": AttributeError,
+                        "RuntimeError": RuntimeError, "StopIteration": StopIteration,
+                        "hasattr": hasattr, "getattr": getattr, "setattr": setattr, "delattr": delattr,
+                        "len": len, "range": range, "enumerate": enumerate, "zip": zip,
+                        "map": map, "filter": filter, "iter": iter, "next": next,
+                        "reversed": reversed, "sorted": sorted, "min": min, "max": max,
+                        "sum": sum, "any": any, "all": all, "dict": dict, "list": list,
+                        "set": set, "tuple": tuple, "str": str, "int": int, "float": float,
+                        "bool": bool, "bytes": bytes, "bytearray": bytearray,
+                        "chr": chr, "ord": ord, "hex": hex, "oct": oct, "bin": bin,
+                        "format": format, "id": id, "hash": hash,
+                    }
+                    restricted = {
+                        "__builtins__": safe_builtins,
+                        "math": __import__("math"),
+                        "statistics": __import__("statistics"),
+                        "json": json,
+                        "datetime": __import__("datetime"),
+                        "time": __import__("time"),
+                        "re": __import__("re"),
+                        "collections": __import__("collections"),
+                        "itertools": __import__("itertools"),
+                        "functools": __import__("functools"),
+                        "uuid": __import__("uuid"),
+                        "typing": __import__("typing"),
+                    }
+                    buffer = io.StringIO()
+                    async def call_tool(name, args_dict):
+                        import subprocess, urllib.request, json
+                        if name == "execute_terminal":
+                            cmd = str(args_dict.get("command", ""))
+                            t_out = max(1, min(int(args_dict.get("timeout", 90)), 300))
+                            proc = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=t_out)
+                            out = proc.stdout.strip()
+                            err = proc.stderr.strip()
+                            combined = "\n".join(p for p in [out, err] if p) or "(No output)"
+                            return {"ok": proc.returncode == 0, "exit_code": proc.returncode, "stdout": out, "stderr": err, "output": combined}
+                        elif name == "search_web":
+                            q = str(args_dict.get("query", ""))
+                            try:
+                                with urllib.request.urlopen(f"https://api.duckduckgo.com/?q={urllib.request.quote(q)}&format=json&no_html=1", timeout=15) as resp:
+                                    data = json.loads(resp.read())
+                                results = []
+                                for topic in data.get("RelatedTopics", [])[:5]:
+                                    if "Text" in topic and "FirstURL" in topic:
+                                        results.append({"title": topic.get("Text", "").split(" - ")[0], "url": topic["FirstURL"], "snippet": topic.get("Text", "")})
+                                return {"ok": True, "output": json.dumps(results, indent=2)}
+                            except Exception as e:
+                                return {"ok": False, "output": f"Search error: {e}"}
+                        elif name == "fetch_url":
+                            url = str(args_dict.get("url", ""))
+                            try:
+                                with urllib.request.urlopen(url, timeout=15) as resp:
+                                    content = resp.read().decode("utf-8", errors="replace")
+                                import re
+                                text = re.sub(r"(?is)<script[^>]*>.*?</script>", "", content)
+                                text = re.sub(r"(?is)<style[^>]*>.*?</style>", "", text)
+                                text = re.sub(r"(?i)<br\s*/?>", "\n", text)
+                                text = re.sub(r"(?is)<[^>]+>", "", text)
+                                text = "\n".join(line for line in text.split("\n") if line.strip())
+                                return {"ok": True, "output": text[:5000]}
+                            except Exception as e:
+                                return {"ok": False, "output": f"Fetch error: {e}"}
+                        elif name == "execute_python_code":
+                            return {"ok": True, "output": execute_python_code(args_dict.get("code", ""))}
+                        elif name == "list_directory_contents":
+                            return {"ok": True, "output": list_directory_contents(args_dict.get("path", "."))}
+                        return {"ok": False, "output": f"Unknown tool: {name}"}
+                    restricted["tools"] = {
+                        "execute_terminal": lambda **kw: asyncio.run(call_tool("execute_terminal", kw)),
+                        "search_web": lambda **kw: asyncio.run(call_tool("search_web", kw)),
+                        "fetch_url": lambda **kw: asyncio.run(call_tool("fetch_url", kw)),
+                        "execute_python_code": lambda **kw: call_tool("execute_python_code", kw),
+                        "list_directory_contents": lambda **kw: call_tool("list_directory_contents", kw),
+                    }
+                    with contextlib.redirect_stdout(buffer):
+                        restricted["__result__"] = None
+                        exec(f"async def __cm_exec():\n" + "\n".join("  " + ln for ln in code.split("\n")), restricted)
+                        restricted["__result__"] = asyncio.run(restricted["__cm_exec"]())
+                    stdout = buffer.getvalue().strip()
+                    output = stdout or (json.dumps(restricted.get("__result__")) if restricted.get("__result__") is not None else "")
+                    return {"ok": True, "exit_code": 0, "stdout": stdout, "stderr": "", "output": output or "(No output)", "timed_out": False}
+                except subprocess.TimeoutExpired:
+                    return {"ok": False, "exit_code": -1, "stdout": "", "stderr": f"Execution timed out after {timeout}s.", "output": f"Execution timed out after {timeout}s.", "timed_out": True}
+                except Exception as e:
+                    err_msg = f"{type(e).__name__}: {e}"
+                    return {"ok": False, "exit_code": 1, "stdout": "", "stderr": err_msg, "output": err_msg, "timed_out": False}
+            try:
+                return await loop.run_in_executor(None, _run)
+            except Exception as e:
+                return {"ok": False, "exit_code": 1, "stdout": "", "stderr": str(e), "output": str(e), "timed_out": False}
 
         def get_gemini_config(payload):
             api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY")
@@ -823,6 +1000,8 @@ def init_ai():
                 inferred.append("execute_python_code")
             if re.search(r"\b(list files|ls|dir|files|folder contents)\b", latest_user):
                 inferred.append("list_directory_contents")
+            if re.search(r"\b(code|script|automate|multi.tep|chain|pipeline|workflow|batch|codemode)\b", latest_user):
+                inferred.append("execute_code")
             return dedupe_tool_names(inferred or SUPPORTED_TOOL_NAMES)
 
         def build_tools_prompt(available_tool_names):
@@ -849,6 +1028,12 @@ def init_ai():
             if "list_directory_contents" in tool_names:
                 tool_lines.append(
                     "Use list_directory_contents to securely list the folders and files in the permitted workspace."
+                )
+            if "execute_code" in tool_names:
+                tool_lines.append(
+                    "Use execute_code to write and run Python that chains multiple tool calls together in a single execution. "
+                    "The sandbox exposes tools as async callables via tools['tool_name']({'arg': 'value'}). "
+                    "Prefer execute_code over individual tool calls when you need to chain, loop, or conditionally branch between tools."
                 )
             fallback_names = ", ".join(f'"{name}"' for name in tool_names)
             return (
@@ -1646,6 +1831,10 @@ def init_ai():
                     "output": list_directory_contents(args.get("path", ".")),
                     "stderr": ""
                 }
+            elif name == "execute_code":
+                code = args.get("code", "")
+                timeout_val = max(1, min(int(args.get("timeout", 60)), 300))
+                result = await run_execute_code(code, timeout_val)
             else:
                 return call_id, {
                     "ok": False,
@@ -2173,45 +2362,50 @@ def init_ai():
 
 def main():
     t0 = time.time()
-    setup_env()
-    setup_cf()
-    if RUN_LLAMA and not init_ai(): sys.exit(1)
-    
-    if EN_WEB: sp.Popen(f'ttyd -i {WEB_HOST} -p 68 -t fontSize=22 bash', shell=True, stdout=open('ttyd.log', 'w'))
-    
-    urls = {}
-    if EN_CF:
-        if RUN_LLAMA:
-            api_url = cf_tunnel(18080, host=PROXY_HOST)
-            if api_url: urls["api"] = f"{api_url}/v1"
-        if EN_WEB:
-            urls["web"] = cf_tunnel(68, host=WEB_HOST)
-    
-    if EN_SSH:
-        run("tmate -S /tmp/tmate.sock new-session -d")
-        for _ in range(15):
-            ssh = run("tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'").stdout.strip()
-            if ssh.startswith("ssh"): urls["ssh"] = ssh; break
-            time.sleep(1)
+    try:
+        setup_env()
+        setup_cf()
+        if RUN_LLAMA and not init_ai(): sys.exit(1)
 
-    print(f"\n\x1b[1;35m╔════════════════════════════════════════════════════════════╗\x1b[0m")
-    print(f"\x1b[1;35m║\x1b[0m  ✨  \x1b[1;36mcollabLLM backend\x1b[0m  \x1b[2m— SETUP COMPLETE in {time.time()-t0:.1f}s\x1b[0m")
-    if urls.get("api"): print(f"\x1b[1;35m╠════════════════════════════════════════════════════════════╣\n║\x1b[0m  🔑 API: \x1b[1;36m{urls['api']}\x1b[0m")
-    if urls.get("web"): print(f"\x1b[1;35m║\x1b[0m  💻 ttyd: \x1b[1;36m{urls['web']}\x1b[0m")
-    if urls.get("ssh"): print(f"\x1b[1;35m║\x1b[0m  🛠️ tmate: \x1b[1;36m{urls['ssh']}\x1b[0m")
-    print(f"\x1b[1;35m╚════════════════════════════════════════════════════════════╝\x1b[0m\n")
+        if EN_WEB: sp.Popen(f'ttyd -i {WEB_HOST} -p 68 -t fontSize=22 bash', shell=True, stdout=open('ttyd.log', 'w'))
 
-    if urls.get("api"):
-        print(f"\x1b[1;33m📋 Paste this link in collabLLM to connect:\x1b[0m")
-        print(f"\x1b[1;36m   {urls['api']}\x1b[0m\n")
-        print(f"\x1b[1;33m⚠️  Cold Start Notice: Preparing GPU VM, compiling packages, and downloading\x1b[0m")
-        print(f"\x1b[1;33m   model weights can take 5 minutes or more. Please wait for the/v1 link to load.\x1b[0m\n")
+        urls = {}
+        if EN_CF:
+            if RUN_LLAMA:
+                api_url = cf_tunnel(18080, host=PROXY_HOST)
+                if api_url: urls["api"] = f"{api_url}/v1"
+            if EN_WEB:
+                urls["web"] = cf_tunnel(68, host=WEB_HOST)
+
+        if EN_SSH:
+            run("tmate -S /tmp/tmate.sock new-session -d")
+            for _ in range(15):
+                ssh = run("tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'").stdout.strip()
+                if ssh.startswith("ssh"): urls["ssh"] = ssh; break
+                time.sleep(1)
+
+        print(f"\n\x1b[1;35m╔════════════════════════════════════════════════════════════╗\x1b[0m")
+        print(f"\x1b[1;35m║\x1b[0m  ✨  \x1b[1;36mcollabLLM backend\x1b[0m  \x1b[2m— SETUP COMPLETE in {time.time()-t0:.1f}s\x1b[0m")
+        if urls.get("api"): print(f"\x1b[1;35m╠════════════════════════════════════════════════════════════╣\n║\x1b[0m  🔑 API: \x1b[1;36m{urls['api']}\x1b[0m")
+        if urls.get("web"): print(f"\x1b[1;35m║\x1b[0m  💻 ttyd: \x1b[1;36m{urls['web']}\x1b[0m")
+        if urls.get("ssh"): print(f"\x1b[1;35m║\x1b[0m  🛠️ tmate: \x1b[1;36m{urls['ssh']}\x1b[0m")
+        print(f"\x1b[1;35m╚════════════════════════════════════════════════════════════╝\x1b[0m\n")
+
+        if urls.get("api"):
+            print(f"\x1b[1;33m📋 Paste this link in collabLLM to connect:\x1b[0m")
+            print(f"\x1b[1;36m   {urls['api']}\x1b[0m\n")
+            print(f"\x1b[1;33m⚠️  Cold Start Notice: Preparing GPU VM, compiling packages, and downloading\x1b[0m")
+            print(f"\x1b[1;33m   model weights can take 5 minutes or more. Please wait for the/v1 link to load.\x1b[0m\n")
 
 
-    if EN_KEEP:
-        while True:
-            time.sleep(300)
-            log("🟢", "Keep-Alive Daemon", "Services Nominal", "2")
+        if EN_KEEP:
+            while True:
+                time.sleep(300)
+                log("🟢", "Keep-Alive Daemon", "Services Nominal", "2")
+    except KeyboardInterrupt:
+        log("🛑", "Shutdown", "Received interrupt, cleaning up...", "1;33")
+        run("pkill -9 -f llama_cpp; pkill -9 -f cloudflared; pkill -9 -f ttyd; pkill -9 -f tmux; pkill -9 -f tmate; pkill -9 -f px.py; pkill -9 -f uvicorn")
+        print("\nShutdown complete.")
 
 if __name__ == "__main__": main()
 

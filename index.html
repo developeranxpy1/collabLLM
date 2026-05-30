@@ -596,6 +596,7 @@
 
     /* Main Chat Panel */
     .main-panel {
+      min-width: 0;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -698,7 +699,7 @@
       background-color: #10b981;
     }
 
-    /* Pill Toggle Switch for Search Mode (Quick vs Adaptive) */
+    /* Pill Toggle Switch for Think Level (Low / Medium / High) */
     .search-mode-toggle {
       display: flex;
       align-items: center;
@@ -711,7 +712,7 @@
       position: relative;
       user-select: none;
       cursor: pointer;
-      margin: 4px 20px 8px 20px;
+      margin: 4px 20px 2px 20px;
       height: 32px;
       box-sizing: border-box;
       transition: border-color 0.2s ease;
@@ -722,12 +723,12 @@
     }
     
     .search-mode-option {
-      padding: 0 14px;
+      padding: 0 10px;
       height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       border-radius: 20px;
       color: var(--text-muted);
@@ -749,16 +750,66 @@
       top: 3px;
       left: 3px;
       height: 24px;
-      width: calc(50% - 3px);
+      width: calc(33.333% - 4px);
       background-color: #ffffff;
       border-radius: 20px;
       z-index: 1;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
     
-    .search-mode-toggle.adaptive-active .search-mode-highlight {
-      transform: translateX(100%);
+    .search-mode-toggle.level-low .search-mode-highlight { left: 3px; }
+    .search-mode-toggle.level-medium .search-mode-highlight { left: calc(33.333% + 1px); }
+    .search-mode-toggle.level-high .search-mode-highlight { left: calc(66.666% - 1px); }
+
+    /* Verbose mode toggle row */
+    .verbose-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 3px 20px 8px 20px;
+      padding: 5px 10px;
+      background: rgba(26, 26, 28, 0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s ease;
+    }
+    .verbose-toggle-row:hover {
+      border-color: #3f3f46;
+    }
+    .verbose-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .verbose-toggle-switch {
+      width: 32px;
+      height: 16px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 2px;
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.25s ease;
+    }
+    .verbose-toggle-switch.active {
+      background: var(--accent-blue, #3c6ff0);
+    }
+    .verbose-toggle-knob {
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.25s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .verbose-toggle-switch.active .verbose-toggle-knob {
+      transform: translateX(16px);
     }
 
     /* Minimalist greeting screen */
@@ -912,18 +963,21 @@
     .chat-logger {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 96px 24px 160px;
       display: flex;
       flex-direction: column;
       gap: 24px;
       width: 100%;
+      min-width: 0;
     }
 
     .msg-row {
       display: flex;
       gap: 16px;
-      max-width: 700px;
+      max-width: 1089px;
       width: 100%;
+      min-width: 0;
       margin: 0 auto;
       animation: messageSlideIn 0.25s ease-out forwards;
     }
@@ -957,6 +1011,7 @@
 
     .msg-body-wrapper {
       max-width: calc(100% - 48px);
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -971,6 +1026,7 @@
       color: var(--text-main);
       font-size: 1.15rem; /* Balanced readability */
       max-width: 100%;
+      min-width: 0;
       word-wrap: break-word;
     }
 
@@ -978,6 +1034,12 @@
       padding: 4px 0;
       color: var(--text-main);
       font-size: 1.15rem; /* Balanced readability */
+      max-width: 100%;
+      min-width: 0;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      overflow: hidden;
     }
 
     /* 60fps Hardware-Accelerated FlowToken Animations */
@@ -1102,6 +1164,8 @@
     /* Markdown Styling */
     .md-body {
       word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
     .md-body p {
@@ -1135,15 +1199,21 @@
       margin: 15px 0;
       border: 1px solid var(--border-color);
       border-radius: 10px;
+      overflow: hidden;
+      min-width: 0;
     }
 
     .code-block-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 14px;
-      background: linear-gradient(135deg, rgba(26, 26, 32, 0.95), rgba(18, 18, 22, 0.98));
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      flex-wrap: nowrap;
+      padding: 8px 12px;
+      background: rgba(20, 20, 24, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       border-radius: 10px 10px 0 0;
       font-family: var(--font-mono);
       font-size: 0.7rem;
@@ -1151,26 +1221,32 @@
       position: sticky;
       top: 0;
       z-index: 10;
-      min-height: 38px;
+      min-height: 42px;
       box-sizing: border-box;
+      gap: 8px;
     }
 
     .code-block-header .code-lang {
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      color: var(--accent-blue, #3b82f6);
-      background-color: var(--accent-blue-alpha, rgba(59, 130, 246, 0.1));
-      padding: 3px 8px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      background-color: rgba(255, 255, 255, 0.04);
+      padding: 4px 8px;
       border-radius: 6px;
       text-transform: uppercase;
-      font-size: 0.62rem;
-      border: 1px solid rgba(255, 255, 255, 0.02);
+      font-size: 0.65rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .code-block-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      flex-shrink: 0;
+      flex-wrap: nowrap;
     }
 
     .code-block-actions button {
@@ -1186,6 +1262,8 @@
       font-family: var(--font-family);
       font-size: 0.68rem;
       font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -1273,6 +1351,9 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .sandbox-logs-box.live {
@@ -1305,16 +1386,24 @@
       display: flex;
       flex-direction: column;
       gap: 1px;
+      min-width: 0;
+      overflow: hidden;
     }
     .sandbox-logs-title-main {
       font-size: 0.78rem;
       font-weight: 600;
       color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .sandbox-logs-title-sub {
       font-size: 0.65rem;
       font-weight: 500;
       color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .sandbox-logs-badge {
@@ -1404,6 +1493,141 @@
       white-space: nowrap;
     }
 
+    .console-output-block {
+      display: block;
+      background: rgba(0, 0, 0, 0.25);
+      border-left: 2px solid rgba(255, 255, 255, 0.08);
+      margin: 4px 0 4px 16px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      color: #d4d4d4;
+      white-space: pre-wrap;
+      word-break: break-all;
+      overflow-x: auto;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    /* Thinking box — shows model's chain-of-thought during generation */
+    .thinking-box {
+      background: linear-gradient(135deg, rgba(20, 25, 40, 0.6), rgba(12, 16, 28, 0.75));
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(120, 150, 255, 0.1);
+      border-radius: 10px;
+      margin: 0 0 10px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .thinking-box.active {
+      display: flex;
+      border-color: rgba(120, 150, 255, 0.18);
+      box-shadow: 0 0 14px rgba(60, 111, 240, 0.05);
+    }
+    .thinking-box.collapsed .thinking-chevron {
+      transform: rotate(-90deg);
+    }
+    .thinking-box.collapsed .thinking-content {
+      max-height: 0 !important;
+      padding: 0 14px !important;
+      opacity: 0;
+    }
+
+    .thinking-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-main);
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s ease;
+    }
+    .thinking-header:hover {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .thinking-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .thinking-title .thinking-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(120, 150, 255, 0.15);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: thinking-spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes thinking-spin {
+      to { transform: rotate(360deg); }
+    }
+    .thinking-title .thinking-done-icon {
+      display: none;
+      color: #10b981;
+    }
+    .thinking-box.done .thinking-spinner { display: none; }
+    .thinking-box.done .thinking-done-icon { display: inline-flex; }
+
+    .thinking-title-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .thinking-title-main {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .thinking-title-sub {
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    .thinking-chevron {
+      transition: transform 0.25s ease;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    .thinking-content {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      background-color: rgba(8, 8, 12, 0.5);
+      padding: 10px 14px;
+      margin: 0 10px 10px;
+      border-radius: 8px;
+      color: rgba(200, 210, 240, 0.9);
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 300px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.6;
+      transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+    }
+    .thinking-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .thinking-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+    }
+
     .msg-utility-actions {
       display: flex;
       gap: 8px;
@@ -1470,12 +1694,12 @@
       gap: 12px;
       margin-bottom: 10px;
       width: 100%;
-      max-width: 700px;
+      max-width: 1089px;
     }
 
     .prompt-box-ds {
       width: 100%;
-      max-width: 700px;
+      max-width: 1089px;
       background-color: var(--bg-input);
       border: 1px solid var(--border-color);
       border-radius: 999px;
@@ -2406,6 +2630,10 @@
       .color-dot-selection {
         gap: 8px;
       }
+      .msg-body-wrapper {
+        max-width: calc(100% - 38px);
+        min-width: 0;
+      }
     }
 
     /* Premium Floating Undo Toast Bar */
@@ -2805,8 +3033,7 @@
         font-size: 0.85rem;
       }
       .nav-chat-title {
-        font-size: 0.82rem;
-        padding: 0 6px;
+        display: none;
       }
       .msg-row.user .msg-bubble,
       .msg-row.assistant .msg-bubble {
@@ -2821,6 +3048,7 @@
       }
       .msg-body-wrapper {
         max-width: calc(100% - 38px);
+        min-width: 0;
       }
     }
 
@@ -2884,6 +3112,7 @@
       }
       .msg-body-wrapper {
         max-width: calc(100% - 34px);
+        min-width: 0;
       }
       .connection-pill {
         padding: 3px 8px;
@@ -3001,6 +3230,26 @@
       .collapsed-floating-pill {
         top: 4px !important;
       }
+      .code-block-actions button {
+        padding: 5px;
+        gap: 0;
+      }
+      .code-block-actions button i {
+        width: 14px !important;
+        height: 14px !important;
+      }
+      /* Hide text labels, show only icons on small screens */
+      .code-block-actions button .btn-label-text {
+        display: none;
+      }
+      .code-block-header {
+        padding: 5px 8px;
+        min-height: 34px;
+      }
+      .code-block-header .code-lang {
+        font-size: 0.55rem;
+        padding: 2px 6px;
+      }
     }
 
     @media (max-width: 360px) {
@@ -3018,7 +3267,7 @@
         padding: 1px 4px;
       }
       .nav-chat-title {
-        font-size: 0.75rem;
+        display: none;
       }
       .prompt-textarea-ds {
         font-size: 0.82rem;
@@ -3032,40 +3281,40 @@
       }
     }
 
-    /* Session Navigator Sidebar - Minimal */
+    /* Session Navigator Sidebar - Invisible Collapsed & Solid Expanded */
     .session-nav-sidebar {
       position: absolute;
-      right: 8px;
+      right: 16px; /* Adjust distance from edge */
       top: 50%;
-      transform: translateY(-50%) translateX(calc(100% - 10px));
-      width: 220px;
-      background-color: rgba(13, 13, 12, 0.5);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      padding: 12px 0;
+      transform: translateY(-50%);
+      width: 40px;
+      box-sizing: border-box;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 14px 10px;
       z-index: 200;
       display: none;
       flex-direction: column;
-      max-height: 65vh;
-      box-shadow: -4px 0 16px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
-      transition: transform 0.25s ease, background-color 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+      max-height: 60vh;
+      box-shadow: none;
+      transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease;
       cursor: pointer;
+      overflow: hidden;
     }
 
     .session-nav-sidebar:hover {
-      transform: translateY(-50%) translateX(0);
-      background-color: rgba(13, 13, 12, 0.92);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-left: 2px solid var(--accent-blue);
-      padding: 12px 10px 12px 14px;
+      width: 240px;
+      background-color: #202020;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 16px;
-      box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
       cursor: default;
     }
+
+
+
+
 
     .session-nav-header {
       font-size: 0.6rem;
@@ -3073,27 +3322,34 @@
       color: var(--text-dim);
       letter-spacing: 1px;
       text-transform: uppercase;
-      padding: 0 12px 10px 16px;
+      text-align: center;
+      padding: 0;
       opacity: 0;
-      transition: opacity 0.2s ease;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.2s ease, max-height 0.25s ease, padding 0.25s ease;
+      white-space: nowrap;
     }
 
     .session-nav-sidebar:hover .session-nav-header {
       opacity: 1;
+      max-height: 20px;
+      padding: 0 0 10px 0;
+      transition-delay: 0.05s;
     }
 
     .session-nav-items {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
       overflow-y: auto;
-      padding: 4px 4px 4px 10px;
+      padding: 0;
       scrollbar-width: thin;
       flex: 1;
     }
 
     .session-nav-items::-webkit-scrollbar {
-      width: 6px;
+      width: 4px;
     }
     .session-nav-items::-webkit-scrollbar-track {
       background: transparent;
@@ -3101,91 +3357,80 @@
     .session-nav-items::-webkit-scrollbar-thumb {
       background-color: #3e3e44;
       border-radius: 10px;
-      transition: background-color 0.2s ease;
     }
     .session-nav-items::-webkit-scrollbar-thumb:hover {
       background-color: #4e4e54;
     }
 
-    .session-nav-item.current-viewing {
-      position: relative;
-      background-color: rgba(255, 255, 255, 0.04);
-    }
-
-    .session-nav-item.current-viewing .nav-item-inner {
-      background-color: rgba(255, 255, 255, 0.06);
-    }
-
-    .session-nav-item.current-viewing .nav-item-content {
-      color: #ffffff;
-      font-weight: 600;
-    }
-
-    .session-nav-item.current-viewing .nav-item-indicator {
-      width: 24px;
-      background-color: var(--accent-blue);
-    }
-
     .session-nav-item {
       cursor: pointer;
-      padding: 1px 4px;
+      padding: 0;
       transition: opacity 0.15s ease;
     }
 
     .nav-item-inner {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 5px 10px;
-      border-radius: 6px;
-      flex-direction: row-reverse;
+      justify-content: flex-end; /* Push dash to the right edge */
+      gap: 12px;
+      padding: 6px 0;
+      border-radius: 8px;
       background-color: transparent;
       border: none;
       width: 100%;
+      transition: background-color 0.15s ease;
     }
 
-    .session-nav-item:hover .nav-item-inner {
-      background-color: rgba(255, 255, 255, 0.04);
-    }
-
-    .session-nav-item.active .nav-item-inner {
-      background-color: rgba(255, 255, 255, 0.06);
+    /* No background highlights, just text color changes */
+    .session-nav-sidebar:hover .session-nav-item:hover .nav-item-content {
+      color: #ffffff;
     }
 
     .nav-item-content {
-      font-size: 0.78rem;
-      line-height: 1.3;
-      color: var(--text-dim);
+      font-size: 0.82rem;
+      line-height: 1.35;
+      color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 150px;
+      text-align: right; /* Text aligns right against the dashes */
       flex: 1;
       opacity: 0;
-      transition: opacity 0.2s ease;
+      max-width: 0;
+      transition: opacity 0.2s ease 0.05s, max-width 0.25s ease, color 0.15s ease;
     }
 
     .session-nav-sidebar:hover .nav-item-content {
       opacity: 1;
+      max-width: 190px;
     }
 
     .session-nav-item.active .nav-item-content {
-      color: var(--accent-blue);
-      font-weight: 600;
+      color: #3b82f6; /* Active text is blue in the GIF */
+      font-weight: 500;
     }
 
     .nav-item-indicator {
-      width: 10px;
-      height: 3px;
-      border-radius: 2px;
-      background-color: #3f3f46;
-      transition: background-color 0.2s ease;
+      width: 12px;
+      height: 2px;
+      border-radius: 1px;
+      background-color: #52525b;
+      transition: all 0.2s ease;
       flex-shrink: 0;
     }
 
     .session-nav-item.active .nav-item-indicator {
-      background-color: var(--accent-blue);
-      width: 18px;
+      background-color: #3b82f6;
+      width: 16px;
+    }
+
+    .session-nav-item.current-viewing .nav-item-content {
+      color: #3b82f6;
+      font-weight: 500;
+    }
+    .session-nav-item.current-viewing .nav-item-indicator {
+      width: 16px;
+      background-color: #3b82f6;
     }
 
     @media (max-width: 1024px) {
@@ -3718,11 +3963,20 @@
         <i data-lucide="circle-plus" style="width:16px;height:16px;"></i> New chat
       </button>
 
-      <!-- Search Mode Toggle Pill -->
-      <div class="search-mode-toggle" id="searchModeToggle" title="Toggle Search Mode: Quick vs Adaptive">
+      <!-- Think Level Toggle Pill -->
+      <div class="search-mode-toggle level-low" id="searchModeToggle" title="Thinking level: Low / Medium / High">
         <div class="search-mode-highlight"></div>
-        <div class="search-mode-option active" id="optQuick">Quick</div>
-        <div class="search-mode-option" id="optAdaptive">Adaptive</div>
+        <div class="search-mode-option active" id="optLow">Low</div>
+        <div class="search-mode-option" id="optMedium">Medium</div>
+        <div class="search-mode-option" id="optHigh">High</div>
+      </div>
+
+      <!-- Verbose mode toggle -->
+      <div class="verbose-toggle-row" id="verboseToggleRow" title="Verbose mode: show raw thinking output">
+        <span class="verbose-label"><i data-lucide="eye" style="width:12px;height:12px;flex-shrink:0;"></i> Verbose</span>
+        <div class="verbose-toggle-switch" id="verboseToggleSwitch">
+          <div class="verbose-toggle-knob"></div>
+        </div>
       </div>
 
       <div class="sidebar-search-box" id="sidebarSearchBox" style="display:none;">
@@ -3868,7 +4122,7 @@
 
       <!-- Rounded central Input box -->
       <div class="input-wrapper-ds">
-        <div style="display:flex; flex-direction:column; width:100%; max-width:700px; align-items:center;">
+        <div style="display:flex; flex-direction:column; width:100%; max-width:1089px; align-items:center;">
           <!-- Options badges row removed -->
 
           <!-- Colab Connection Warning Container -->
@@ -4061,7 +4315,10 @@
           </div>
         </div>
 
-        <!-- SHARED MODAL FOOTER (Removed for auto-save) -->
+        <div style="display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid var(--border-color);margin-top:auto;">
+          <button onclick="hideModal(true)" style="padding:8px 20px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--text-main);font-size:.8rem;cursor:pointer;">Close</button>
+          <button onclick="hideModal(false)" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent-blue);color:#fff;font-size:.8rem;cursor:pointer;">Save</button>
+        </div>
       </main>
     </div>
   </div>
@@ -4310,7 +4567,8 @@
         theme: 'dark'
       },
       user: null,
-      deepThinkActive: false, 
+      thinkLevel: 'low', // 'low' | 'medium' | 'high'
+      verboseMode: false,
       searchActive: true,      
       speechSynth: window.speechSynthesis,
       utterance: null,
@@ -4686,9 +4944,12 @@
         try {
           appState.settings = { ...appState.settings, ...JSON.parse(savedSettings) };
         } catch (e) {}
-        // Restore deepThinkActive from settings
-        if (appState.settings.deepThinkActive !== undefined) {
-          appState.deepThinkActive = appState.settings.deepThinkActive;
+        // Restore thinkLevel and verboseMode from settings
+        if (appState.settings.thinkLevel) {
+          appState.thinkLevel = appState.settings.thinkLevel;
+        }
+        if (appState.settings.verboseMode !== undefined) {
+          appState.verboseMode = appState.settings.verboseMode;
         }
       }
 
@@ -5038,31 +5299,77 @@
         
         itemsContainer.appendChild(row);
       });
+      
+      if (window.lucide) window.lucide.createIcons({ nodes: [sidebar] });
+      
+      // Update active item immediately after render
+      setTimeout(updateSessionNavActiveItem, 50);
+    }
+
+    function updateSessionNavActiveItem() {
+      if (!ui.chatLogger) return;
+      const userBubbles = ui.chatLogger.querySelectorAll('.msg-row.user');
+      if (userBubbles.length === 0) return;
+      
+      let activeIndex = null;
+      const containerRect = ui.chatLogger.getBoundingClientRect();
+      
+      userBubbles.forEach(bubble => {
+        const rect = bubble.getBoundingClientRect();
+        const relativeTop = rect.top - containerRect.top;
+        
+        // Find the last bubble that has scrolled past the upper middle of the view
+        if (relativeTop < containerRect.height / 2) {
+          const indexPart = bubble.id.split('-').pop();
+          activeIndex = parseInt(indexPart, 10);
+        }
+      });
+      
+      // If we haven't scrolled far enough for the first item, default to first item
+      if (activeIndex === null && userBubbles.length > 0) {
+        activeIndex = parseInt(userBubbles[0].id.split('-').pop(), 10);
+      }
+      
+      if (activeIndex !== null) {
+        document.querySelectorAll('.session-nav-item').forEach(row => {
+          const rowIdx = parseInt(row.dataset.index, 10);
+          const isActive = rowIdx === activeIndex;
+          
+          if (isActive && !row.classList.contains('active')) {
+            row.classList.add('active');
+            
+            // Auto-scroll the sidebar list to keep the active item in view
+            const container = document.getElementById('sessionNavItems');
+            if (container) {
+              const rowTop = row.offsetTop;
+              const rowHeight = row.offsetHeight;
+              const contHeight = container.clientHeight;
+              const scrollTop = container.scrollTop;
+              
+              if (rowTop < scrollTop || rowTop + rowHeight > scrollTop + contHeight) {
+                container.scrollTo({
+                  top: Math.max(0, rowTop - contHeight / 2 + rowHeight / 2),
+                  behavior: 'smooth'
+                });
+              }
+            }
+          } else if (!isActive) {
+            row.classList.remove('active');
+          }
+        });
+      }
     }
 
     function setupScrollSpy() {
-      ui.chatLogger.addEventListener('scroll', () => {
-        const userBubbles = ui.chatLogger.querySelectorAll('.msg-row.user');
-        let activeIndex = null;
-        const containerRect = ui.chatLogger.getBoundingClientRect();
-        
-        userBubbles.forEach(bubble => {
-          const rect = bubble.getBoundingClientRect();
-          const relativeTop = rect.top - containerRect.top;
-          
-          if (relativeTop < 200) {
-            const indexPart = bubble.id.split('-').pop();
-            activeIndex = parseInt(indexPart, 10);
-          }
+      if (ui.chatLogger) {
+        ui.chatLogger.addEventListener('scroll', () => {
+          if (window._navSpyTimeout) return;
+          window._navSpyTimeout = setTimeout(() => {
+            updateSessionNavActiveItem();
+            window._navSpyTimeout = null;
+          }, 50);
         });
-        
-        if (activeIndex !== null) {
-          document.querySelectorAll('.session-nav-item').forEach(row => {
-            const rowIdx = parseInt(row.dataset.index, 10);
-            row.classList.toggle('active', rowIdx === activeIndex);
-          });
-        }
-      });
+      }
     }
 
     let googleTokenClient = null;
@@ -5070,10 +5377,12 @@
     let _driveSyncTimer = null;
     let _driveSyncVersion = 0;
     let _lastSyncTime = null;
+    let _healthFailCount = 0;
 
     function initGoogleAuth() {
       if (typeof google === 'undefined') {
         console.warn('Google Identity Services SDK not loaded yet.');
+        setTimeout(initGoogleAuth, 500);
         return;
       }
       googleTokenClient = google.accounts.oauth2.initTokenClient({
@@ -5082,35 +5391,48 @@
         callback: (response) => {
           if (response.error) {
             console.error('Google Auth error:', response);
-            showNotification('Google sign-in failed or was cancelled.');
+            if (response.error !== 'user_not_logged_in' && response.error !== 'consent_required') {
+              showNotification('Google sign-in failed or was cancelled.');
+            }
             return;
           }
           if (response.access_token) {
             _googleAccessToken = response.access_token;
-            showNotification('Retrieving Google profile...');
-            fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-              headers: { Authorization: `Bearer ${response.access_token}` }
-            })
-            .then(res => res.json())
-            .then(userInfo => {
-              appState.user = {
-                name: userInfo.name || 'Google User',
-                email: userInfo.email,
-                picture: userInfo.picture
-              };
-              localStorage.setItem('collabllm_user', JSON.stringify(appState.user));
+            try { localStorage.setItem('collabllm_google_token', JSON.stringify({ token: response.access_token, savedAt: Date.now() })); } catch(e) {}
+            // Only fetch profile if we don't already have it (silent login skips this)
+            if (!appState.user || !appState.user.email) {
+              showNotification('Retrieving Google profile...');
+              fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${response.access_token}` }
+              })
+              .then(res => res.json())
+              .then(userInfo => {
+                appState.user = {
+                  name: userInfo.name || 'Google User',
+                  email: userInfo.email,
+                  picture: userInfo.picture
+                };
+                localStorage.setItem('collabllm_user', JSON.stringify(appState.user));
+                renderProfileFooter();
+                showNotification(`Signed in as ${appState.user.name}`);
+                loadFromDrive(true);
+              })
+              .catch(err => {
+                console.error('Failed to get userinfo:', err);
+                showNotification('Failed to retrieve user profile.');
+              });
+            } else {
+              // Silent login success — refresh Drive data
               renderProfileFooter();
-              showNotification(`Signed in as ${appState.user.name}`);
-              // After sign-in, try to fetch data from Drive
               loadFromDrive(true);
-            })
-            .catch(err => {
-              console.error('Failed to get userinfo:', err);
-              showNotification('Failed to retrieve user profile.');
-            });
+            }
           }
         }
       });
+      // Try silent login if we have a saved user
+      if (appState.user && appState.user.email) {
+        try { googleTokenClient.requestAccessToken({ prompt: '' }); } catch(e) {}
+      }
     }
 
     function requestDriveToken() {
@@ -5121,8 +5443,11 @@
           client_id: '887244312260-dusovdpcp42sub6pjn76mlmuk4feci3n.apps.googleusercontent.com',
           scope: 'https://www.googleapis.com/auth/drive.file',
           callback: (resp) => {
-            if (resp.access_token) { _googleAccessToken = resp.access_token; resolve(resp.access_token); }
-            else { reject(resp.error || 'No token'); }
+            if (resp.access_token) {
+              _googleAccessToken = resp.access_token;
+              try { localStorage.setItem('collabllm_google_token', JSON.stringify({ token: resp.access_token, savedAt: Date.now() })); } catch(e) {}
+              resolve(resp.access_token);
+            } else { reject(resp.error || 'No token'); }
           }
         });
         client.requestAccessToken({ prompt: '' });
@@ -5130,7 +5455,30 @@
     }
 
     async function getDriveToken() {
-      if (_googleAccessToken) return _googleAccessToken;
+      if (_googleAccessToken) {
+        // Check if token is less than 50 min old (tokens expire in ~1h)
+        const stored = localStorage.getItem('collabllm_google_token');
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Date.now() - parsed.savedAt < 50 * 60 * 1000) {
+              return _googleAccessToken;
+            }
+          } catch(e) {}
+        }
+        return _googleAccessToken;
+      }
+      // Try restoring from localStorage
+      const stored = localStorage.getItem('collabllm_google_token');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Date.now() - parsed.savedAt < 50 * 60 * 1000) {
+            _googleAccessToken = parsed.token;
+            return _googleAccessToken;
+          }
+        } catch(e) {}
+      }
       return await requestDriveToken();
     }
 
@@ -5224,12 +5572,16 @@
     function handleGoogleLogin() {
       if (!googleTokenClient) {
         initGoogleAuth();
+        setTimeout(() => {
+          if (googleTokenClient) {
+            googleTokenClient.requestAccessToken({ prompt: 'consent' });
+          } else {
+            showNotification('Google auth service is currently loading.');
+          }
+        }, 1000);
+        return;
       }
-      if (googleTokenClient) {
-        googleTokenClient.requestAccessToken();
-      } else {
-        showNotification('Google auth service is currently loading.');
-      }
+      googleTokenClient.requestAccessToken({ prompt: 'consent' });
     }
 
     // Render Profile Footer based on user state
@@ -5345,6 +5697,7 @@
           <span></span><span></span><span></span><span></span><span></span>
         </span>
       `;
+      _healthFailCount = 0;
       window.updateDynamicIsland('collabLLM Ready', 'Connected & Operational', 'online');
       ui.sendBtn.title = "Send message";
     }
@@ -5446,8 +5799,8 @@
       if (isGenerating) {
         ui.healthDot.classList.add('online');
         ui.healthText.textContent = 'open colab';
-
         updateColabCardVisibility(true);
+        _healthFailCount = 0;
         if (force || lastBackendState !== 'generating') {
           lastBackendState = 'generating';
           window.updateDynamicIsland('collabLLM Core', 'Thinking and generating response...', 'generating');
@@ -5459,6 +5812,7 @@
         ui.healthDot.classList.remove('online');
         ui.healthText.textContent = 'open colab';
         updateColabCardVisibility(false);
+        _healthFailCount = 5;
         if (force || lastBackendState !== 'disabled') {
           lastBackendState = 'disabled';
           window.updateDynamicIsland('collabLLM Backend', 'Disconnected and offline', 'offline');
@@ -5467,32 +5821,65 @@
       }
 
       if (force) {
+        _healthFailCount = 0;
         lastBackendState = 'connecting';
         window.updateDynamicIsland('collabLLM Backend', 'Connecting to backend...', 'connecting');
       }
 
-      const url = `${appState.settings.proxyUrl}/health`;
-      try {
-        // Increased timeout to 8000ms (8 seconds) to accommodate high latency or busy backend pings
-        const response = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(8000) });
-        if (response.ok) {
-          const stats = await response.json();
-          ui.healthDot.classList.add('online');
-          ui.healthText.textContent = 'open colab';
-          updateColabCardVisibility(true);
-          if (force || lastBackendState !== 'online') {
-            lastBackendState = 'online';
-            window.updateDynamicIsland('collabLLM Backend', `Connected: ${stats.model || 'collabLLM'}`, 'online');
+      // Try multiple health endpoints in order
+      const healthUrls = [
+        `${appState.settings.proxyUrl}/health`,
+        `${appState.settings.proxyUrl.replace(/\/v1\/?$/, '')}/health`,
+        `${appState.settings.proxyUrl.replace(/\/v1\/?$/, '')}`
+      ];
+      let lastError = '';
+      let success = false;
+      for (const url of healthUrls) {
+        try {
+          const response = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(8000) });
+          if (response.ok) {
+            success = true;
+            break;
           }
-          return true;
+          lastError = `HTTP ${response.status}`;
+        } catch (e) {
+          lastError = e.name === 'AbortError' ? 'Timeout (8s)' : e.message || 'Network error';
         }
-      } catch (e) {}
-      ui.healthDot.classList.remove('online');
-      ui.healthText.textContent = 'open colab';
-      updateColabCardVisibility(false);
-      if (force || lastBackendState !== 'offline') {
-        lastBackendState = 'offline';
-        window.updateDynamicIsland('collabLLM Backend', 'Offline - Click to connect', 'offline');
+      }
+
+      if (success) {
+        _healthFailCount = 0;
+        ui.healthDot.classList.add('online');
+        ui.healthText.textContent = 'open colab';
+        updateColabCardVisibility(true);
+        if (force || lastBackendState !== 'online') {
+          lastBackendState = 'online';
+          try {
+            const statsResp = await fetch(healthUrls[0], { method: 'GET', signal: AbortSignal.timeout(4000) });
+            if (statsResp.ok) {
+              const stats = await statsResp.json();
+              window.updateDynamicIsland('collabLLM Backend', `Connected: ${stats.model || 'collabLLM'}`, 'online');
+            } else {
+              window.updateDynamicIsland('collabLLM Backend', 'Connected & Operational', 'online');
+            }
+          } catch(e) {
+            window.updateDynamicIsland('collabLLM Backend', 'Connected & Operational', 'online');
+          }
+        }
+        return true;
+      }
+
+      // Health check failed — use consecutive failure tolerance
+      _healthFailCount++;
+      const requiredFailures = force ? 1 : 3; // force mode fails immediately; polling tolerates 2 blips
+      if (_healthFailCount >= requiredFailures) {
+        ui.healthDot.classList.remove('online');
+        ui.healthText.textContent = 'open colab';
+        updateColabCardVisibility(false);
+        if (lastBackendState !== 'offline') {
+          lastBackendState = 'offline';
+          window.updateDynamicIsland('collabLLM Backend', `Offline - ${lastError}`, 'offline');
+        }
       }
       return false;
     }
@@ -5751,6 +6138,7 @@
 
     function switchActiveChat(id) {
       appState.activeChatId = id;
+      localStorage.setItem('collabllm_active_chat_id', id || '');
       const chat = appState.chats.find(c => c.id === id);
       if (!chat) return;
 
@@ -5841,6 +6229,7 @@
 
     function startNewConversation() {
       appState.activeChatId = null;
+      localStorage.removeItem('collabllm_active_chat_id');
       document.querySelectorAll('.history-item').forEach(el => el.classList.remove('active'));
       ui.chatLogger.style.display = 'none';
       ui.greetingArea.style.display = 'flex';
@@ -5864,7 +6253,8 @@
       const subEl = document.getElementById('navChatSubtitle');
       if (title) {
         textEl.textContent = title;
-        subEl.textContent = appState.deepThinkActive ? 'Adaptive' : 'Quick';
+        const levelLabels = { low: 'Low', medium: 'Medium', high: 'High' };
+        subEl.textContent = levelLabels[appState.thinkLevel] || 'Low';
         titleEl.classList.add('visible');
       } else {
         titleEl.classList.remove('visible');
@@ -6070,6 +6460,56 @@
       const text = ui.promptInput.textContent.trim();
       if (!text) return;
 
+      // Slash commands: /think low|medium|high, /verbose on|off
+      if (text.startsWith('/')) {
+        const parts = text.slice(1).toLowerCase().split(/\s+/);
+        const cmd = parts[0];
+        const arg = parts.slice(1).join(' ');
+        if (cmd === 'think' && ['low', 'medium', 'high'].includes(arg)) {
+          if (window.setThinkLevel) window.setThinkLevel(arg);
+          ui.promptInput.innerHTML = '<br class="ProseMirror-trailingBreak">';
+          resizeInputArea(ui.promptInput);
+          return;
+        }
+        if (cmd === 'verbose') {
+          if (arg === '') {
+            appState.verboseMode = !appState.verboseMode;
+          } else {
+            appState.verboseMode = arg === 'on' || arg === '1' || arg === 'true';
+          }
+          if (window.updateVerboseUI) window.updateVerboseUI();
+          if (window.saveVerboseMode) window.saveVerboseMode();
+          showNotification(`Verbose mode ${appState.verboseMode ? 'ON' : 'OFF'}`);
+          ui.promptInput.innerHTML = '<br class="ProseMirror-trailingBreak">';
+          resizeInputArea(ui.promptInput);
+          return;
+        }
+        if (cmd === 'new') {
+          if (typeof startNewConversation === 'function') startNewConversation();
+          ui.promptInput.innerHTML = '<br class="ProseMirror-trailingBreak">';
+          resizeInputArea(ui.promptInput);
+          return;
+        }
+        if (cmd === 'status') {
+          const levelLabels = { low: 'Low', medium: 'Medium', high: 'High' };
+          const isOnline = ui.healthDot.classList.contains('online');
+          const chatCount = appState.chats.length;
+          const activeId = appState.activeChatId ? appState.chats.findIndex(c => c.id === appState.activeChatId) + 1 : 0;
+          const model = appState.settings.model || 'local-model';
+          showNotification(`🟢 ${isOnline ? 'Online' : 'Offline'} · Think: ${levelLabels[appState.thinkLevel]} · Verbose: ${appState.verboseMode ? 'ON' : 'OFF'} · Model: ${model} · ${chatCount} chats${activeId ? ' · Chat #'+activeId : ''}`);
+          ui.promptInput.innerHTML = '<br class="ProseMirror-trailingBreak">';
+          resizeInputArea(ui.promptInput);
+          return;
+        }
+        if (cmd === 'help') {
+          showNotification('Commands: /think low|medium|high, /verbose on|off, /new, /status, /help');
+          ui.promptInput.innerHTML = '<br class="ProseMirror-trailingBreak">';
+          resizeInputArea(ui.promptInput);
+          return;
+        }
+        // Unknown slash command — let it pass through to the model
+      }
+
       const isConnectionUrl = /^(https?:\/\/)?([\w\-]+\.)*(trycloudflare\.com|ngrok-free\.app|ngrok\.io|localhost|127\.0\.0\.1)(:\d+)?(\/.*)?$/i.test(text) ||
                              text.includes('trycloudflare.com') ||
                              text.includes('ngrok-free.app') ||
@@ -6092,6 +6532,7 @@
         }
 
         appState.settings.proxyUrl = formattedUrl;
+        appState.settings.backendDisabled = false;
         localStorage.setItem('collabllm_settings', JSON.stringify(appState.settings));
         if (ui.proxyField) ui.proxyField.value = formattedUrl;
 
@@ -6099,12 +6540,20 @@
         resizeInputArea(ui.promptInput);
         
         window.updateDynamicIsland('Backend Configured', 'Connecting to new backend...', 'connecting');
+        _healthFailCount = 0; // Reset failure counter for new backend
         
+        // Try connecting, retry after 3s if first attempt fails (backend warmup)
         verifyBackendConnection(true).then(online => {
           if (online) {
-            window.updateDynamicIsland('Backend Connected', 'Successfully connected!', 'online');
+            runBackendPing(true);
           } else {
-            window.updateDynamicIsland('Connection Failed', 'Could not reach backend.', 'offline');
+            setTimeout(async () => {
+              const retryOnline = await verifyBackendConnection(true);
+              if (retryOnline) {
+                runBackendPing(true);
+              }
+              // verifyBackendConnection already sets DI with error details on failure
+            }, 3000);
           }
         });
         return;
@@ -6134,6 +6583,7 @@
         };
         appState.chats.unshift(chat);
         appState.activeChatId = chat.id;
+        localStorage.setItem('collabllm_active_chat_id', chat.id);
         localStorage.setItem('collabllm_chats', JSON.stringify(appState.chats));
         debounceSyncToDrive();
         renderHistory();
@@ -6230,6 +6680,25 @@
       `;
       // Store the scoped ID for later reference
       liveToolBox.dataset.liveId = liveId;
+
+      // Thinking box for chain-of-thought / reasoning display
+      const thinkingBox = document.createElement('div');
+      thinkingBox.className = 'thinking-box';
+      thinkingBox.innerHTML = `
+        <div class="thinking-header" onclick="this.parentElement.classList.toggle('collapsed')">
+          <span class="thinking-title">
+            <span class="thinking-spinner"></span>
+            <i data-lucide="check-circle" class="thinking-done-icon" style="width:14px;height:14px;"></i>
+            <span class="thinking-title-text">
+              <span class="thinking-title-main">Thinking</span>
+              <span class="thinking-title-sub">Working through the problem...</span>
+            </span>
+          </span>
+          <i data-lucide="chevron-down" class="thinking-chevron" style="width:14px;height:14px;"></i>
+        </div>
+        <div class="thinking-content"></div>
+      `;
+
       let _toolStartTime = Date.now();
       let _toolStepCount = 0;
 
@@ -6238,6 +6707,7 @@
       bubble.innerHTML = '<div style="display:flex;align-items:center;gap:6px;"><i data-lucide="loader-2" class="spin-loader" style="width:14px;height:14px;"></i> Thinking...</div>';
 
       wrapper.appendChild(liveToolBox);
+      wrapper.appendChild(thinkingBox);
       wrapper.appendChild(bubble);
       row.appendChild(avatar);
       row.appendChild(wrapper);
@@ -6260,12 +6730,19 @@
         model: 'local-model',
         messages: payloadMessages,
         stream: true,
-        search_mode: appState.deepThinkActive ? 'adaptive' : 'quick',
+        search_mode: appState.thinkLevel === 'low' ? 'quick' : 'adaptive',
         tools_enabled: appState.searchActive
       };
 
       let outputContent = '';
       const logsTracker = [];
+      const renderConsoleLines = (lines) => lines.map(l => {
+        if (l.startsWith('OUTPUT:')) return `<span class="console-output-block">${l.replace(/^OUTPUT:/, '')}</span>`;
+        if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
+        if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
+        if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
+        return l;
+      }).join('\n');
 
       isGenerating = true;
       document.querySelector('.prompt-box-ds').classList.add('generating');
@@ -6326,70 +6803,116 @@
                     bubble.innerHTML = '';
                     bubble.classList.add('streaming');
                     isFirstDelta = false;
+                    // Activate thinking box with live raw stream
+                    thinkingBox.classList.add('active');
+                    thinkingBox._thinkStart = Date.now();
+                    thinkingBox._thinkInterval = setInterval(() => {
+                      const sub = thinkingBox.querySelector('.thinking-title-sub');
+                      if (sub && thinkingBox.classList.contains('active') && !thinkingBox.classList.contains('collapsed')) {
+                        const elapsed = ((Date.now() - thinkingBox._thinkStart) / 1000).toFixed(1);
+                        sub.textContent = `Thinking... ${elapsed}s`;
+                      }
+                    }, 1000);
                   }
                   outputContent += delta;
+                  // Pipe raw delta into thinking box in real-time
+                  const thinkingContent = thinkingBox.querySelector('.thinking-content');
+                  if (thinkingContent && thinkingBox.classList.contains('active')) {
+                    thinkingContent.textContent = outputContent;
+                    // Auto-collapse after 800ms (skip if verboseMode is on)
+                    if (!appState.verboseMode && !thinkingBox._thinkTimer && outputContent.length > 60) {
+                      thinkingBox._thinkTimer = setTimeout(() => {
+                        if (thinkingBox.classList.contains('active')) {
+                          thinkingBox.classList.add('collapsed');
+                          const sub = thinkingBox.querySelector('.thinking-title-sub');
+                          if (sub) sub.textContent = 'Click to expand raw output';
+                        }
+                      }, 800);
+                    }
+                  }
 
                   // --- Tool call detection & execution ---
-                  const toolCallRegex = /<\|tool_call\|>call:(\w+)\{([^}]*)\}<tool_call\|>/g;
+                  if (!window._toolCallTracker) window._toolCallTracker = new Set();
+                  const toolCallRegex = /<\|tool_call\|?>([\s\S]*?)<\/?\|?tool_call\|>/g;
                   let toolCallMatch;
                   let toolCallResolved = false;
                   while ((toolCallMatch = toolCallRegex.exec(outputContent)) !== null) {
+                    const raw = toolCallMatch[1].trim();
+                    if (window._toolCallTracker.has(raw)) continue;
+                    window._toolCallTracker.add(raw);
                     toolCallResolved = true;
-                    const toolName = toolCallMatch[1];
-                    const toolArgs = toolCallMatch[2];
+                    const toolName = raw.startsWith('call:') ? raw.slice(5).split(/[{(\s]/)[0] : 'tool';
+                    const innerVal = raw.match(/<\|"\|>([\s\S]*)<\|"\|>/);
+                    let toolArgs = innerVal
+                      ? innerVal[1].trim()
+                      : raw.replace(/^call:\w+\{/, '').replace(/[}<]$/, '').replace(/<\|"\|>/g, '').replace(/^\w+:/, '').trim();
                     liveToolBox.style.display = 'flex';
                     _toolStepCount++;
-                    const logEntry = `▶ Tool: ${toolName}`;
-                    if (!logsTracker.includes(logEntry)) logsTracker.push(logEntry);
+                    logsTracker.push(`▶ ${toolName}`);
+                    logsTracker.push(`OUTPUT:$ ${toolArgs}`);
                     if (consoleEl) {
                       consoleEl.style.display = 'block';
-                      consoleEl.innerHTML = logsTracker.join('\n');
+                      consoleEl.innerHTML = renderConsoleLines(logsTracker);
                     }
                     if (titleEl) titleEl.textContent = `Running: ${toolName}`;
-                    if (subEl) subEl.textContent = `Args: ${toolArgs}`;
+                    if (subEl) subEl.textContent = toolArgs.slice(0, 60);
+                    // Show code in a code block style for execute_code
+                    if (toolName === 'execute_code') {
+                      logsTracker.push(`OUTPUT:\`\`\`python\n${toolArgs.slice(0, 400)}${toolArgs.length > 400 ? '\n...' : ''}\n\`\`\``);
+                    }
                     scrollToBottomSmart();
-                    // Execute the tool call via proxy
+                    // Try executing via proxy execute endpoint (fails gracefully if not available)
                     (async () => {
-                      try {
-                        const execResp = await fetch(`${appState.settings.proxyUrl}/execute`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ command: toolArgs, tool: toolName })
-                        });
-                        const execResult = execResp.ok ? await execResp.text() : 'Execution failed: ' + execResp.status;
-                        logsTracker.push(`✓ ${toolName} completed`);
-                        if (consoleEl) {
-                          consoleEl.innerHTML = logsTracker.map(l => {
-                            if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
-                            if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
-                            if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
-                            return l;
-                          }).join('\n') + '\n' + execResult.slice(0, 500);
-                        }
-                        if (titleEl) titleEl.textContent = `${toolName} completed`;
-                        if (subEl) subEl.textContent = `Step ${_toolStepCount} completed`;
-                        scrollToBottomSmart();
-                      } catch(e) {
-                        logsTracker.push(`✗ ${toolName} error: ${e.message}`);
-                        if (consoleEl) {
-                          consoleEl.innerHTML = logsTracker.map(l => {
-                            if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
-                            if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
-                            if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
-                            return l;
-                          }).join('\n');
-                        }
-                        if (badgeEl) {
-                          badgeEl.className = 'sandbox-logs-badge error';
-                          badgeEl.innerHTML = '<i data-lucide="alert-circle" style="width:10px;height:10px;"></i> ERROR';
-                          if (window.lucide) window.lucide.createIcons({ nodes: [badgeEl] });
-                        }
-                        scrollToBottomSmart();
+                      const execEndpoints = ['/execute', '/tools/execute', '/api/execute'];
+                      let execResult = null;
+                      for (const ep of execEndpoints) {
+                        try {
+                          const execResp = await fetch(`${appState.settings.proxyUrl}${ep}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(toolName === 'execute_code'
+                              ? { code: toolArgs, tool: toolName }
+                              : { command: toolArgs, tool: toolName }),
+                            signal: AbortSignal.timeout(toolName === 'execute_code' ? 30000 : 8000)
+                          });
+                          if (execResp.ok) {
+                            execResult = await execResp.text();
+                            break;
+                          }
+                        } catch(e) {}
                       }
+                      if (execResult) {
+                        let displayText = execResult;
+                        let completionStatus = `✓ ${toolName} completed`;
+                        try {
+                          const j = JSON.parse(execResult);
+                          const outParts = [];
+                          if (j.stdout) outParts.push(j.stdout);
+                          if (j.stderr) outParts.push(j.stderr);
+                          if (j.output && !j.stdout && !j.stderr) outParts.push(j.output);
+                          displayText = outParts.join('\n') || JSON.stringify(j, null, 2);
+                          if (j.exit_code === 0) {
+                            completionStatus = `✓ ${toolName} completed (exit 0)`;
+                          } else {
+                            completionStatus = `✗ ${toolName} failed (exit ${j.exit_code})`;
+                          }
+                        } catch(e) {}
+                        const execTruncated = displayText.length > 1500 ? displayText.slice(0, 1500) + '\n... (truncated)' : displayText;
+                        logsTracker.push(`OUTPUT:${execTruncated}`);
+                        logsTracker.push(completionStatus);
+                      } else if (!logsTracker.some(l => l.startsWith('✓') && l.includes(toolName))) {
+                        logsTracker.push(`  ⚡ execution endpoint not available`);
+                      }
+                      if (consoleEl && logsTracker.length > 0) {
+                        consoleEl.innerHTML = renderConsoleLines(logsTracker);
+                      }
+                      if (titleEl) titleEl.textContent = execResult ? `${toolName} completed` : `Running: ${toolName}`;
+                      if (subEl) subEl.textContent = `Step ${_toolStepCount} · ${((Date.now() - _toolStartTime) / 1000).toFixed(1)}s`;
+                      scrollToBottomSmart();
                     })();
                   }
                   if (toolCallResolved) {
-                    outputContent = outputContent.replace(toolCallRegex, '').trim();
+                    outputContent = outputContent.replace(/<\|tool_call\|?>[\s\S]*?<\/?\|?tool_call\|>/g, '').trim();
                   }
                   // --- End tool call handling ---
 
@@ -6417,12 +6940,7 @@
                   logsTracker.push(logEntry);
                   if (consoleEl) {
                     consoleEl.style.display = 'block';
-                    consoleEl.innerHTML = logsTracker.map(l => {
-                      if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
-                      if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
-                      if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
-                      return l;
-                    }).join('\n');
+                    consoleEl.innerHTML = renderConsoleLines(logsTracker);
                   }
                 }
                 scrollToBottomSmart();
@@ -6431,12 +6949,7 @@
                 logsTracker.push(`✓ ${blockId} completed`);
                 if (consoleEl) {
                   consoleEl.style.display = 'block';
-                  consoleEl.innerHTML = logsTracker.map(l => {
-                    if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
-                    if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
-                    if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
-                    return l;
-                  }).join('\n');
+                  consoleEl.innerHTML = renderConsoleLines(logsTracker);
                 }
                 if (titleEl) titleEl.textContent = 'Analyzing results...';
                 if (subEl) subEl.textContent = `${_toolStepCount} steps · ${((Date.now() - _toolStartTime) / 1000).toFixed(1)}s elapsed`;
@@ -6446,12 +6959,7 @@
                 logsTracker.push(`✗ Error: ${errorMsg}`);
                 if (consoleEl) {
                   consoleEl.style.display = 'block';
-                  consoleEl.innerHTML = logsTracker.map(l => {
-                    if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
-                    if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
-                    if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
-                    return l;
-                  }).join('\n');
+                  consoleEl.innerHTML = renderConsoleLines(logsTracker);
                 }
                 if (titleEl) titleEl.textContent = 'Tool encountered an error';
                 if (badgeEl) {
@@ -6462,15 +6970,10 @@
                 scrollToBottomSmart();
               } else if (command.startsWith('tool-output-')) {
                 const outputLine = command.replace('tool-output-', '');
-                logsTracker.push(`  ${outputLine}`);
+                logsTracker.push(`OUTPUT:${outputLine}`);
                 if (consoleEl) {
                   consoleEl.style.display = 'block';
-                  consoleEl.innerHTML = logsTracker.map(l => {
-                    if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
-                    if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
-                    if (l.startsWith('▶')) return `<span style="color:#f59e0b">${l}</span>`;
-                    return l;
-                  }).join('\n');
+                  consoleEl.innerHTML = renderConsoleLines(logsTracker);
                 }
                 scrollToBottomSmart();
               }
@@ -6478,13 +6981,138 @@
           }
         }
 
+        // === Auto-retry loop: feed failed tool results back to the model ===
+        if (logsTracker.length > 0) {
+          let retryCount = 0;
+          while (retryCount < 5) {
+            const hasFailures = logsTracker.some(l => l.startsWith('✗'));
+            const outputIsEmpty = !outputContent || outputContent === '[Empty stream response returned from backend]';
+            if (!hasFailures && !outputIsEmpty) break;
+            retryCount++;
+            const _lid = liveToolBox.dataset.liveId;
+            const titleEl = liveToolBox.querySelector(`[data-live-title="${_lid}"]`);
+            const subEl = liveToolBox.querySelector(`[data-live-sub="${_lid}"]`);
+            const badgeEl = liveToolBox.querySelector(`[data-live-badge="${_lid}"]`);
+            if (titleEl) titleEl.textContent = `Retrying (${retryCount}/5)...`;
+            if (subEl) subEl.textContent = `Feeding tool results back to model`;
+            if (badgeEl) {
+              badgeEl.className = 'sandbox-logs-badge running';
+              badgeEl.innerHTML = '<i data-lucide="loader-2" class="spin-loader" style="width:10px;height:10px;"></i> RETRYING';
+              if (window.lucide) window.lucide.createIcons({ nodes: [badgeEl] });
+            }
+            const toolLogText = logsTracker.join('\n');
+            const continuationMessages = [
+              ...payloadMessages,
+              { role: 'assistant', content: 'I tried using tools to complete the task.' },
+              { role: 'user', content: `Tool execution results:\n${toolLogText}\n\nIf there were errors, please try a different command or approach. Continue with the original task.` }
+            ];
+            try {
+              const retryResp = await fetch(`${appState.settings.proxyUrl}/chat/completions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  model: 'local-model',
+                  messages: continuationMessages,
+                  stream: true,
+                  search_mode: appState.thinkLevel === 'low' ? 'quick' : 'adaptive',
+                  tools_enabled: appState.searchActive
+                }),
+                signal: activeAbortController.signal
+              });
+              if (!retryResp.ok) break;
+              const retryReader = retryResp.body.getReader();
+              let retryBuffer = '';
+              if (outputIsEmpty) { bubble.innerHTML = ''; bubble.classList.add('streaming'); }
+              outputContent = '';
+              while (true) {
+                const { done, value } = await retryReader.read();
+                if (done) break;
+                retryBuffer += decoder.decode(value, { stream: true });
+                const retryParts = retryBuffer.split('\n');
+                retryBuffer = retryParts.pop();
+                for (const line of retryParts) {
+                  const trimmed = line.trim();
+                  if (!trimmed) continue;
+                  const _lid2 = liveToolBox.dataset.liveId;
+                  const cEl = liveToolBox.querySelector(`[data-live-console="${_lid2}"]`);
+                  const tEl = liveToolBox.querySelector(`[data-live-title="${_lid2}"]`);
+                  const sEl = liveToolBox.querySelector(`[data-live-sub="${_lid2}"]`);
+                  if (trimmed.startsWith('data: ')) {
+                    const dataText = trimmed.slice(6);
+                    if (dataText === '[DONE]') break;
+                    try {
+                      const json = JSON.parse(dataText);
+                      const delta = json.choices?.[0]?.delta?.content || '';
+                      if (delta) {
+                        outputContent += delta;
+                        outputContent = outputContent.replace(/<\|tool_call\|?>[\s\S]*?<\/?\|?tool_call\|>/g, '').trim();
+                        const targetHtml = marked.parse(outputContent);
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = targetHtml;
+                        diffAndUpdateDOM(bubble, tempDiv, appState.settings);
+                        if (window.lucide) window.lucide.createIcons({ nodes: [bubble] });
+                        scrollToBottomSmart();
+                      }
+                    } catch(e) {}
+                  } else if (trimmed.startsWith(': ')) {
+                    const cmd = trimmed.slice(2);
+                    if (cmd.startsWith('tool-running-') || cmd.startsWith('tool-round-')) {
+                      const actionName = cmd.replace('tool-running-', '').replace('tool-round-', 'Round ');
+                      _toolStepCount++;
+                      liveToolBox.style.display = 'flex';
+                      if (tEl) tEl.textContent = `Running: ${actionName}`;
+                      if (sEl) sEl.textContent = `Step ${_toolStepCount} · ${((Date.now() - _toolStartTime) / 1000).toFixed(1)}s`;
+                      logsTracker.push(`▶ ${actionName}`);
+                      if (cEl) { cEl.style.display = 'block'; cEl.innerHTML = renderConsoleLines(logsTracker); }
+                      scrollToBottomSmart();
+                    } else if (cmd.startsWith('tool-complete-')) {
+                      const blockId = cmd.replace('tool-complete-', '');
+                      logsTracker.push(`✓ ${blockId} completed`);
+                      if (cEl) { cEl.style.display = 'block'; cEl.innerHTML = renderConsoleLines(logsTracker); }
+                      scrollToBottomSmart();
+                    } else if (cmd.startsWith('tool-error-')) {
+                      const errMsg = cmd.replace('tool-error-', '');
+                      logsTracker.push(`✗ Error: ${errMsg}`);
+                      if (cEl) { cEl.style.display = 'block'; cEl.innerHTML = renderConsoleLines(logsTracker); }
+                      scrollToBottomSmart();
+                    } else if (cmd.startsWith('tool-output-')) {
+                      logsTracker.push(`OUTPUT:${cmd.replace('tool-output-', '')}`);
+                      if (cEl) { cEl.style.display = 'block'; cEl.innerHTML = renderConsoleLines(logsTracker); }
+                      scrollToBottomSmart();
+                    }
+                  }
+                }
+              }
+            } catch(e) {
+              if (e.name === 'AbortError') break;
+              break;
+            }
+          }
+        }
+
         if (!outputContent) {
-          outputContent = '[Empty stream response returned from backend]';
+          outputContent = logsTracker.length > 0
+            ? '⚙️ Tool execution completed. See sandbox logs above.'
+            : '[Empty stream response returned from backend]';
           bubble.innerHTML = outputContent;
         }
 
         // Finalize FlowBubble by stripping classes and animations
         finalizeFlowBubble(bubble);
+
+        // Finalize thinking box to done state
+        if (thinkingBox.classList.contains('active')) {
+          if (thinkingBox._thinkInterval) { clearInterval(thinkingBox._thinkInterval); delete thinkingBox._thinkInterval; }
+          thinkingBox.classList.remove('active');
+          thinkingBox.classList.add('done');
+          const thinkingContent = thinkingBox.querySelector('.thinking-content');
+          if (thinkingContent && outputContent) {
+            thinkingContent.textContent = outputContent;
+          }
+          const sub = thinkingBox.querySelector('.thinking-title-sub');
+          const elapsed = thinkingBox._thinkStart ? ((Date.now() - thinkingBox._thinkStart) / 1000).toFixed(1) : null;
+          if (sub) sub.textContent = elapsed ? `Thought for ${elapsed}s` : 'Response generated';
+        }
 
         // Transition live tracker to finalized state
         if (logsTracker.length > 0) {
@@ -6496,14 +7124,15 @@
           const titleEl = liveToolBox.querySelector(`[data-live-title="${_lid}"]`);
           const subEl = liveToolBox.querySelector(`[data-live-sub="${_lid}"]`);
           const badgeEl = liveToolBox.querySelector(`[data-live-badge="${_lid}"]`);
-          const headerIcon = liveToolBox.querySelector('.sandbox-logs-title > i');
+          const headerIcon = liveToolBox.querySelector('.sandbox-logs-title > i, .sandbox-logs-title > svg');
 
           if (titleEl) titleEl.textContent = `Sandbox Actions · ${_toolStepCount} step${_toolStepCount !== 1 ? 's' : ''}`;
           if (subEl) subEl.textContent = `Completed in ${totalTime}s`;
           if (headerIcon) {
             headerIcon.classList.remove('spin-loader');
-            headerIcon.setAttribute('data-lucide', hasError ? 'alert-circle' : 'terminal');
-            headerIcon.style.color = hasError ? '#ef4444' : 'var(--accent-blue)';
+            headerIcon.outerHTML = hasError
+              ? '<i data-lucide="alert-circle" style="width:14px;height:14px;color:#ef4444;flex-shrink:0;"></i>'
+              : '<i data-lucide="terminal" style="width:14px;height:14px;color:var(--accent-blue);flex-shrink:0;"></i>';
           }
           if (badgeEl) {
             badgeEl.className = `sandbox-logs-badge ${hasError ? 'error' : 'done'}`;
@@ -6514,15 +7143,8 @@
           // Render final colored logs
           const consoleEl = liveToolBox.querySelector(`[data-live-console="${_lid}"]`);
           if (consoleEl) {
-            consoleEl.innerHTML = logsTracker.map(l => {
-              if (l.startsWith('✓')) return `<span style="color:#10b981">${l}</span>`;
-              if (l.startsWith('✗')) return `<span style="color:#ef4444">${l}</span>`;
-              if (l.startsWith('▶')) return `<span style="color:var(--text-muted)">${l}</span>`;
-              return `<span style="color:var(--text-dim)">${l}</span>`;
-            }).join('\n');
+            consoleEl.innerHTML = renderConsoleLines(logsTracker);
           }
-          // Start collapsed for finalized logs
-          liveToolBox.classList.add('collapsed');
           if (window.lucide) window.lucide.createIcons({ nodes: [liveToolBox] });
         } else {
           liveToolBox.style.display = 'none';
@@ -6556,10 +7178,25 @@
       } catch (err) {
         if (err.name === 'AbortError') {
           console.log('Stream generation aborted by user.');
+          // Still show what we have in the thinking box
+          if (thinkingBox.classList.contains('active')) {
+            if (thinkingBox._thinkInterval) { clearInterval(thinkingBox._thinkInterval); delete thinkingBox._thinkInterval; }
+            thinkingBox.classList.remove('active');
+            thinkingBox.classList.add('done');
+            const sub = thinkingBox.querySelector('.thinking-title-sub');
+            if (sub) sub.textContent = 'Generation stopped';
+          }
         } else {
           console.error(err);
           liveToolBox.style.display = 'none';
           bubble.innerHTML = `<span style="color:#ef4444;font-weight:600;"><i data-lucide="alert-triangle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Stream Connection Failed</span><br><span style="font-size:0.8rem;color:var(--text-muted);">Please verify that the backend is online at: ${appState.settings.proxyUrl}</span>`;
+          if (thinkingBox.classList.contains('active')) {
+            if (thinkingBox._thinkInterval) { clearInterval(thinkingBox._thinkInterval); delete thinkingBox._thinkInterval; }
+            thinkingBox.classList.remove('active');
+            thinkingBox.classList.add('done');
+            const sub = thinkingBox.querySelector('.thinking-title-sub');
+            if (sub) sub.textContent = 'Connection failed';
+          }
         }
       } finally {
         resetSendButton();
@@ -6945,8 +7582,13 @@
           ui.promptInput.innerHTML = '';
           resizeInputArea(ui.promptInput);
           
-          verifyBackendConnection();
-          showNotification('✓ API endpoint connected: ' + apiUrl);
+          _healthFailCount = 0;
+          verifyBackendConnection(true).then(online => {
+            if (online) {
+              showNotification('✓ API endpoint connected: ' + apiUrl);
+            }
+            // When offline, verifyBackendConnection already sets DI with error details
+          });
         }
       });
 
@@ -6996,62 +7638,76 @@
         }
       });
 
-      // Search Mode Toggle Pill Wiring
+      // Think Level Toggle Pill Wiring (Low / Medium / High)
       const searchModeToggle = document.getElementById('searchModeToggle');
-      const optQuick = document.getElementById('optQuick');
-      const optAdaptive = document.getElementById('optAdaptive');
+      const optLow = document.getElementById('optLow');
+      const optMedium = document.getElementById('optMedium');
+      const optHigh = document.getElementById('optHigh');
       
       function updateSearchModeUI() {
-        if (appState.deepThinkActive) {
-          searchModeToggle.classList.add('adaptive-active');
-          optQuick.classList.remove('active');
-          optAdaptive.classList.add('active');
-        } else {
-          searchModeToggle.classList.remove('adaptive-active');
-          optQuick.classList.add('active');
-          optAdaptive.classList.remove('active');
-        }
+        const levels = ['low', 'medium', 'high'];
+        const labels = { low: 'Low', medium: 'Medium', high: 'High' };
+        const opts = [optLow, optMedium, optHigh];
+        
+        searchModeToggle.className = 'search-mode-toggle';
+        searchModeToggle.classList.add('level-' + appState.thinkLevel);
+        
+        opts.forEach((opt, i) => {
+          opt.classList.toggle('active', levels[i] === appState.thinkLevel);
+        });
+        
         // Update any current title subtitle dynamically
         const subEl = document.getElementById('navChatSubtitle');
         if (subEl && subEl.textContent) {
-          subEl.textContent = appState.deepThinkActive ? 'Adaptive' : 'Quick';
+          subEl.textContent = labels[appState.thinkLevel] || 'Low';
         }
       }
       
       function saveSearchMode() {
-        appState.settings.deepThinkActive = appState.deepThinkActive;
+        appState.settings.thinkLevel = appState.thinkLevel;
         localStorage.setItem('collabllm_settings', JSON.stringify(appState.settings));
       }
 
-      optQuick.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (appState.deepThinkActive) {
-          appState.deepThinkActive = false;
-          updateSearchModeUI();
-          saveSearchMode();
-          showNotification('Search mode changed to Quick');
-        }
-      });
-      
-      optAdaptive.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (!appState.deepThinkActive) {
-          appState.deepThinkActive = true;
-          updateSearchModeUI();
-          saveSearchMode();
-          showNotification('Search mode changed to Adaptive');
-        }
-      });
-      
-      searchModeToggle.addEventListener('click', () => {
-        appState.deepThinkActive = !appState.deepThinkActive;
+      function setThinkLevel(level) {
+        if (appState.thinkLevel === level) return;
+        appState.thinkLevel = level;
         updateSearchModeUI();
         saveSearchMode();
-        showNotification(`Search mode changed to ${appState.deepThinkActive ? 'Adaptive' : 'Quick'}`);
+        showNotification(`Thinking level: ${level.charAt(0).toUpperCase() + level.slice(1)}`);
+      }
+
+      optLow.addEventListener('click', (e) => { e.stopPropagation(); setThinkLevel('low'); });
+      optMedium.addEventListener('click', (e) => { e.stopPropagation(); setThinkLevel('medium'); });
+      optHigh.addEventListener('click', (e) => { e.stopPropagation(); setThinkLevel('high'); });
+
+      // Verbose mode toggle
+      const verboseToggleRow = document.getElementById('verboseToggleRow');
+      const verboseToggleSwitch = document.getElementById('verboseToggleSwitch');
+      
+      function updateVerboseUI() {
+        verboseToggleSwitch.classList.toggle('active', appState.verboseMode);
+      }
+      
+      function saveVerboseMode() {
+        appState.settings.verboseMode = appState.verboseMode;
+        localStorage.setItem('collabllm_settings', JSON.stringify(appState.settings));
+      }
+      
+      verboseToggleRow.addEventListener('click', () => {
+        appState.verboseMode = !appState.verboseMode;
+        updateVerboseUI();
+        saveVerboseMode();
+        showNotification(`Verbose mode ${appState.verboseMode ? 'ON' : 'OFF'}`);
       });
+      
+      // Expose for slash commands from sendMessage()
+      window.setThinkLevel = setThinkLevel;
+      window.updateVerboseUI = updateVerboseUI;
+      window.saveVerboseMode = saveVerboseMode;
       
       // Initialize state on load
       updateSearchModeUI();
+      updateVerboseUI();
     }
 
     // App Initialization
@@ -7059,6 +7715,12 @@
       loadAppState();
       configureEventHandlers();
       
+      // Restore last active chat session across page reloads
+      const savedActiveId = localStorage.getItem('collabllm_active_chat_id');
+      if (savedActiveId && appState.chats.some(c => c.id === savedActiveId)) {
+        switchActiveChat(savedActiveId);
+      }
+
       // Initialize Google Identity Services
       setTimeout(initGoogleAuth, 1000);
       
@@ -7085,8 +7747,8 @@
       // Setup settings tab switching
       setupSettingsTabSwitching();
       
-      // Verification ping cycle
-      setInterval(verifyBackendConnection, 5000);
+      // Verification ping cycle (10s interval, tolerates 2 transient failures)
+      setInterval(verifyBackendConnection, 10000);
     });
   </script>
 </body>
