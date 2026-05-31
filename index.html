@@ -1039,7 +1039,6 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
       word-break: break-word;
-      overflow: hidden;
     }
 
     /* 60fps Hardware-Accelerated FlowToken Animations */
@@ -1199,9 +1198,8 @@
       margin: 15px 0;
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      overflow: hidden;
+      overflow: visible;
       min-width: 0;
-      position: relative;
     }
 
     .code-block-header {
@@ -1213,15 +1211,16 @@
       background: rgba(20, 20, 24, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      border-radius: 10px 10px 0 0;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
       font-family: var(--font-mono);
       font-size: 0.7rem;
       color: var(--text-dim);
       position: sticky;
-      top: 0;
+      top: 6px;
       z-index: 10;
+      margin: 6px 6px 0;
       min-height: 42px;
       box-sizing: border-box;
       gap: 8px;
@@ -1238,9 +1237,14 @@
       color: #34d399;
     }
     .code-block-actions button.btn-code-run.running {
-      color: #f59e0b;
-      border-color: rgba(245, 158, 11, 0.2);
-      background-color: rgba(245, 158, 11, 0.08);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.25);
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+    .code-block-actions button.btn-code-run.running:hover {
+      background-color: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
     }
 
     .code-run-output {
@@ -1254,6 +1258,7 @@
       overflow-y: auto;
       white-space: pre-wrap;
       word-break: break-word;
+      border-radius: 0 0 10px 10px;
     }
     .code-run-output .run-label {
       color: #10b981;
@@ -1261,8 +1266,10 @@
       font-size: 0.65rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       display: block;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding-bottom: 4px;
     }
     .code-run-output .run-error {
       color: #ef4444;
@@ -1360,6 +1367,7 @@
       padding: 14px;
       margin: 0;
       overflow-x: auto;
+      overflow-y: hidden;
       white-space: pre;
     }
 
@@ -4440,12 +4448,6 @@
 
     // Configure Marked
     marked.setOptions({
-      highlight: function(code, lang) {
-        if (lang && hljs.getLanguage(lang)) {
-          return hljs.highlight(code, { language: lang }).value;
-        }
-        return hljs.highlightAuto(code).value;
-      },
       breaks: true
     });
 
@@ -4453,7 +4455,9 @@
     renderer.code = function(token) {
       const codeText = token.text || '';
       const lang = token.lang || 'text';
-      const escapedCode = codeText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const highlighted = (lang && hljs.getLanguage(lang))
+        ? hljs.highlight(codeText, { language: lang }).value
+        : hljs.highlightAuto(codeText).value;
       const id = 'cb-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
       const runnableLangs = ['javascript','js','python','py','html'];
       const isRunnable = runnableLangs.includes(lang.toLowerCase());
@@ -4479,7 +4483,7 @@
               </button>
             </div>
           </div>
-          <pre><code class="hljs language-${lang}">${escapedCode}</code></pre>
+          <pre><code class="hljs language-${lang}">${highlighted}</code></pre>
         </div>
       `;
     };
@@ -6330,6 +6334,13 @@
     // Run code block in a sandbox
     window.runCodeBlock = function(btn, lang) {
       const wrapper = btn.closest('.code-block-wrapper');
+
+      // If already running, stop it
+      if (btn.classList.contains('running')) {
+        stopCodeBlock(btn, wrapper);
+        return;
+      }
+
       const code = wrapper.querySelector('pre code').textContent;
 
       // Remove existing output
@@ -6337,89 +6348,124 @@
       if (existingOutput) existingOutput.remove();
 
       btn.classList.add('running');
-      btn.innerHTML = '<i data-lucide="loader" style="width:12px;height:12px;"></i> Running...';
+      btn.innerHTML = '<i data-lucide="square" style="width:12px;height:12px;"></i> Stop';
       lucide.createIcons();
 
       const outputDiv = document.createElement('div');
       outputDiv.className = 'code-run-output';
       wrapper.appendChild(outputDiv);
 
+      wrapper._runLang = lang;
+      wrapper._runOutput = outputDiv;
+      wrapper._runBtn = btn;
+      wrapper._aborted = false;
+
       if (lang === 'javascript' || lang === 'js') {
-        // Execute JavaScript directly with captured console output
-        try {
-          const logs = [];
-          const fakeConsole = {
-            log: (...args) => logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ')),
-            error: (...args) => logs.push('❌ ' + args.map(a => String(a)).join(' ')),
-            warn: (...args) => logs.push('⚠️ ' + args.map(a => String(a)).join(' ')),
-            info: (...args) => logs.push(args.map(a => String(a)).join(' ')),
-          };
-          const fn = new Function('console', code);
-          const result = fn(fakeConsole);
-          if (result !== undefined) logs.push('→ ' + (typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result)));
-          outputDiv.innerHTML = '<span class="run-label">Output</span>' + (logs.length > 0 ? logs.join('\n') : '<span style="color:#52525b">No output</span>');
-        } catch (e) {
-          outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">' + e.toString() + '</span>';
-        }
-        btn.classList.remove('running');
-        btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
-        lucide.createIcons();
-
+        runJavaScript(wrapper, code);
       } else if (lang === 'python' || lang === 'py') {
-        // Run Python via Pyodide in a hidden iframe
-        outputDiv.innerHTML = '<span class="run-label">Output</span><span style="color:#52525b">Loading Python runtime...</span>';
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        const pyCode = JSON.stringify(code);
-        iframeDoc.open();
-        iframeDoc.write('<html><body><script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"><\/script><script>async function run(){try{const p=await loadPyodide();p.runPython("import sys,io;sys.stdout=io.StringIO()");p.runPython(' + pyCode + ');const o=p.runPython("sys.stdout.getvalue()");parent.postMessage({type:"pyodide-result",output:o||"(No output)",id:"' + wrapper.id + '"},"*")}catch(e){parent.postMessage({type:"pyodide-result",error:e.toString(),id:"' + wrapper.id + '"},"*")}}run();<\/script></body></html>');
-        iframeDoc.close();
-
-        const handler = (evt) => {
-          if (evt.data && evt.data.type === 'pyodide-result' && evt.data.id === wrapper.id) {
-            window.removeEventListener('message', handler);
-            iframe.remove();
-            if (evt.data.error) {
-              outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">' + evt.data.error + '</span>';
-            } else {
-              outputDiv.innerHTML = '<span class="run-label">Output</span>' + evt.data.output;
-            }
-            btn.classList.remove('running');
-            btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
-            lucide.createIcons();
-          }
-        };
-        window.addEventListener('message', handler);
-
-        // Timeout after 30s
-        setTimeout(() => {
-          window.removeEventListener('message', handler);
-          iframe.remove();
-          if (btn.classList.contains('running')) {
-            outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">Timed out after 30s</span>';
-            btn.classList.remove('running');
-            btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
-            lucide.createIcons();
-          }
-        }, 30000);
-
+        runPython(wrapper, code);
       } else if (lang === 'html') {
-        // Render HTML in a sandboxed iframe
-        outputDiv.innerHTML = '<span class="run-label">Preview</span>';
-        const previewFrame = document.createElement('iframe');
-        previewFrame.style.cssText = 'width:100%;min-height:150px;border:none;border-radius:4px;background:#fff;margin-top:6px;';
-        previewFrame.sandbox = 'allow-scripts';
-        outputDiv.appendChild(previewFrame);
-        const pDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-        pDoc.open();
-        pDoc.write(code);
-        pDoc.close();
-        btn.classList.remove('running');
-        btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
-        lucide.createIcons();
+        runHtml(wrapper, code);
       }
+    };
+
+    function stopCodeBlock(btn, wrapper) {
+      wrapper._aborted = true;
+      if (wrapper._pyIframe) {
+        wrapper._pyIframe.remove();
+        wrapper._pyIframe = null;
+      }
+      if (wrapper._htmlIframe) {
+        wrapper._htmlIframe.remove();
+        wrapper._htmlIframe = null;
+      }
+      const outputDiv = wrapper._runOutput;
+      if (outputDiv) {
+        outputDiv.innerHTML = '<span class="run-label">Output</span><span style="color:#f59e0b">⏹ Execution stopped</span>';
+      }
+      finishRun(btn);
+    }
+
+    function finishRun(btn) {
+      btn.classList.remove('running');
+      btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
+      lucide.createIcons();
+    }
+
+    function runJavaScript(wrapper, code) {
+      const outputDiv = wrapper._runOutput;
+      const logs = [];
+      const fakeConsole = {
+        log: (...args) => { if (wrapper._aborted) return; logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ')); },
+        error: (...args) => { if (wrapper._aborted) return; logs.push('❌ ' + args.map(a => String(a)).join(' ')); },
+        warn: (...args) => { if (wrapper._aborted) return; logs.push('⚠️ ' + args.map(a => String(a)).join(' ')); },
+        info: (...args) => { if (wrapper._aborted) return; logs.push(args.map(a => String(a)).join(' ')); },
+      };
+      try {
+        const fn = new Function('console', code);
+        const result = fn(fakeConsole);
+        if (wrapper._aborted) return;
+        if (result !== undefined) logs.push('→ ' + (typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result)));
+        outputDiv.innerHTML = '<span class="run-label">Output</span>' + (logs.length > 0 ? logs.join('\n') : '<span style="color:#52525b">No output</span>');
+      } catch (e) {
+        if (wrapper._aborted) return;
+        outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">' + e.toString() + '</span>';
+      }
+      finishRun(wrapper._runBtn);
+    }
+
+    function runPython(wrapper, code) {
+      const outputDiv = wrapper._runOutput;
+      outputDiv.innerHTML = '<span class="run-label">Output</span><span style="color:#52525b">Loading Python runtime...</span>';
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+      wrapper._pyIframe = iframe;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      const pyCode = JSON.stringify(code);
+      iframeDoc.open();
+      iframeDoc.write('<html><body><script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"><\/script><script>async function run(){try{const p=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.24.1/full/"});p.runPython("import sys,io;sys.stdout=io.StringIO()");p.runPython(' + pyCode + ');const o=p.runPython("sys.stdout.getvalue()");parent.postMessage({type:"pyodide-result",output:o||"(No output)",id:"' + wrapper.id + '"},"*")}catch(e){parent.postMessage({type:"pyodide-result",error:e.toString(),id:"' + wrapper.id + '"},"*")}}run();<\/script></body></html>');
+      iframeDoc.close();
+
+      const handler = (evt) => {
+        if (evt.data && evt.data.type === 'pyodide-result' && evt.data.id === wrapper.id) {
+          window.removeEventListener('message', handler);
+          if (wrapper._aborted) return;
+          if (wrapper._pyIframe) { wrapper._pyIframe.remove(); wrapper._pyIframe = null; }
+          if (evt.data.error) {
+            outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">' + evt.data.error + '</span>';
+          } else {
+            outputDiv.innerHTML = '<span class="run-label">Output</span>' + evt.data.output;
+          }
+          finishRun(wrapper._runBtn);
+        }
+      };
+      window.addEventListener('message', handler);
+
+      setTimeout(() => {
+        window.removeEventListener('message', handler);
+        if (wrapper._aborted) return;
+        if (wrapper._pyIframe) { wrapper._pyIframe.remove(); wrapper._pyIframe = null; }
+        if (wrapper._runBtn && wrapper._runBtn.classList.contains('running')) {
+          outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">Timed out after 30s</span>';
+          finishRun(wrapper._runBtn);
+        }
+      }, 30000);
+    }
+
+    function runHtml(wrapper, code) {
+      const outputDiv = wrapper._runOutput;
+      outputDiv.innerHTML = '<span class="run-label">Preview</span>';
+      const previewFrame = document.createElement('iframe');
+      previewFrame.style.cssText = 'width:100%;min-height:150px;border:none;border-radius:4px;background:#fff;margin-top:6px;';
+      previewFrame.sandbox = 'allow-scripts';
+      outputDiv.appendChild(previewFrame);
+      wrapper._htmlIframe = previewFrame;
+      const pDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+      pDoc.open();
+      pDoc.write(code);
+      pDoc.close();
+      finishRun(wrapper._runBtn);
     };
 
     window.copyResponse = function(idx) {
