@@ -14,24 +14,25 @@
   <img src="https://img.shields.io/badge/Cost-Free-brightgreen?style=flat-square" alt="Cost">
 </p>
 
+<p align="center">
+  <a href="https://collabllm.vercel.app">
+    <img src="https://img.shields.io/badge/🚀_Try_collabLLM_Now-blue?style=for-the-badge&logoColor=white" alt="Try collabLLM Now">
+  </a>
+</p>
+
 ---
 
 ## 🕒 Last Updated
 
-> **Sunday, May 31, 2026 at 03:33 AM IST**
+> **Sunday, May 31, 2026 at 12:44 PM IST**
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshot
 
 <p align="center">
-  <img src="assets/screenshot_chat.png" alt="collabLLM Chat Interface" width="90%">
+  <img src="assets/screenshot_main.png" alt="collabLLM Interface" width="90%">
   <br><i>Premium dark-mode chat interface with Dynamic Island, glassmorphism navbar, and pill-shaped prompt</i>
-</p>
-
-<p align="center">
-  <img src="assets/screenshot_welcome.png" alt="collabLLM Welcome & Setup" width="90%">
-  <br><i>Welcome screen with one-click Google Colab setup card</i>
 </p>
 
 ---

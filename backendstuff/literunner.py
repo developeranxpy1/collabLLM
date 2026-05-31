@@ -35,7 +35,7 @@ import os, subprocess as sp, time, sys, json, random, base64 as b64, socket, re,
 # --- CONFIG ---
 RUN_LLAMA, EN_CF, EN_WEB, EN_SSH, EN_KEEP = True, True, True, False, True
 CTX, GPUS = 16384, 35
-M_URL = "https://huggingface.co/HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive/resolve/main/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf"
+M_URL = "https://huggingface.co/HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive/resolve/main/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q8_K_P.gguf"
 M_FILE = "/content/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive-Q4_K_M.gguf"
 LLAMA_HOST = os.environ.get("LLAMA_HOST", "127.0.0.1")
 PROXY_HOST = os.environ.get("PROXY_HOST", "127.0.0.1")

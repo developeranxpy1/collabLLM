@@ -1201,6 +1201,7 @@
       border-radius: 10px;
       overflow: hidden;
       min-width: 0;
+      position: relative;
     }
 
     .code-block-header {
@@ -1209,11 +1210,11 @@
       justify-content: space-between;
       flex-wrap: nowrap;
       padding: 8px 12px;
-      background: rgba(20, 20, 24, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(20, 20, 24, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
       border-radius: 10px 10px 0 0;
       font-family: var(--font-mono);
       font-size: 0.7rem;
@@ -1224,6 +1225,47 @@
       min-height: 42px;
       box-sizing: border-box;
       gap: 8px;
+    }
+
+    .code-block-actions button.btn-code-run {
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.2);
+      background-color: rgba(16, 185, 129, 0.08);
+    }
+    .code-block-actions button.btn-code-run:hover {
+      background-color: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+    .code-block-actions button.btn-code-run.running {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.2);
+      background-color: rgba(245, 158, 11, 0.08);
+    }
+
+    .code-run-output {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(10, 10, 14, 0.85);
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #a1a1aa;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .code-run-output .run-label {
+      color: #10b981;
+      font-weight: 600;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .code-run-output .run-error {
+      color: #ef4444;
     }
 
     .code-block-header .code-lang {
@@ -1509,123 +1551,6 @@
       overflow-x: auto;
       max-height: 200px;
       overflow-y: auto;
-    }
-
-    /* Thinking box — shows model's chain-of-thought during generation */
-    .thinking-box {
-      background: linear-gradient(135deg, rgba(20, 25, 40, 0.6), rgba(12, 16, 28, 0.75));
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(120, 150, 255, 0.1);
-      border-radius: 10px;
-      margin: 0 0 10px;
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .thinking-box.active {
-      display: flex;
-      border-color: rgba(120, 150, 255, 0.18);
-      box-shadow: 0 0 14px rgba(60, 111, 240, 0.05);
-    }
-    .thinking-box.collapsed .thinking-chevron {
-      transform: rotate(-90deg);
-    }
-    .thinking-box.collapsed .thinking-content {
-      max-height: 0 !important;
-      padding: 0 14px !important;
-      opacity: 0;
-    }
-
-    .thinking-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-main);
-      padding: 10px 14px;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.15s ease;
-    }
-    .thinking-header:hover {
-      background-color: rgba(255, 255, 255, 0.03);
-    }
-
-    .thinking-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .thinking-title .thinking-spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(120, 150, 255, 0.15);
-      border-top-color: var(--accent-blue);
-      border-radius: 50%;
-      animation: thinking-spin 0.8s linear infinite;
-      flex-shrink: 0;
-    }
-    @keyframes thinking-spin {
-      to { transform: rotate(360deg); }
-    }
-    .thinking-title .thinking-done-icon {
-      display: none;
-      color: #10b981;
-    }
-    .thinking-box.done .thinking-spinner { display: none; }
-    .thinking-box.done .thinking-done-icon { display: inline-flex; }
-
-    .thinking-title-text {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-    .thinking-title-main {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-    .thinking-title-sub {
-      font-size: 0.65rem;
-      font-weight: 500;
-      color: var(--text-dim);
-    }
-
-    .thinking-chevron {
-      transition: transform 0.25s ease;
-      color: var(--text-dim);
-      flex-shrink: 0;
-      margin-left: 8px;
-    }
-
-    .thinking-content {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      background-color: rgba(8, 8, 12, 0.5);
-      padding: 10px 14px;
-      margin: 0 10px 10px;
-      border-radius: 8px;
-      color: rgba(200, 210, 240, 0.9);
-      overflow-x: auto;
-      overflow-y: auto;
-      max-height: 300px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      line-height: 1.6;
-      transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
-    }
-    .thinking-content::-webkit-scrollbar {
-      width: 4px;
-    }
-    .thinking-content::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
     }
 
     .msg-utility-actions {
@@ -3972,7 +3897,7 @@
       </div>
 
       <!-- Verbose mode toggle -->
-      <div class="verbose-toggle-row" id="verboseToggleRow" title="Verbose mode: show raw thinking output">
+      <div class="verbose-toggle-row" id="verboseToggleRow" title="Verbose mode: show raw output">
         <span class="verbose-label"><i data-lucide="eye" style="width:12px;height:12px;flex-shrink:0;"></i> Verbose</span>
         <div class="verbose-toggle-switch" id="verboseToggleSwitch">
           <div class="verbose-toggle-knob"></div>
@@ -4530,11 +4455,19 @@
       const lang = token.lang || 'text';
       const escapedCode = codeText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       const id = 'cb-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+      const runnableLangs = ['javascript','js','python','py','html'];
+      const isRunnable = runnableLangs.includes(lang.toLowerCase());
+      const runBtn = isRunnable
+        ? `<button class="btn-code-run" onclick="runCodeBlock(this, '${lang.toLowerCase()}')" title="Run code">
+             <i data-lucide="play" style="width:12px;height:12px;"></i> Run
+           </button>`
+        : '';
       return `
         <div class="code-block-wrapper" id="${id}">
           <div class="code-block-header">
             <span class="code-lang">${lang.toUpperCase()}</span>
             <div class="code-block-actions">
+              ${runBtn}
               <button class="btn-code-edit" onclick="editCodeBlock(this)" title="Edit code">
                 <i data-lucide="pencil" style="width:12px;height:12px;"></i> Edit
               </button>
@@ -6394,6 +6327,101 @@
       lucide.createIcons();
     };
 
+    // Run code block in a sandbox
+    window.runCodeBlock = function(btn, lang) {
+      const wrapper = btn.closest('.code-block-wrapper');
+      const code = wrapper.querySelector('pre code').textContent;
+
+      // Remove existing output
+      const existingOutput = wrapper.querySelector('.code-run-output');
+      if (existingOutput) existingOutput.remove();
+
+      btn.classList.add('running');
+      btn.innerHTML = '<i data-lucide="loader" style="width:12px;height:12px;"></i> Running...';
+      lucide.createIcons();
+
+      const outputDiv = document.createElement('div');
+      outputDiv.className = 'code-run-output';
+      wrapper.appendChild(outputDiv);
+
+      if (lang === 'javascript' || lang === 'js') {
+        // Execute JavaScript directly with captured console output
+        try {
+          const logs = [];
+          const fakeConsole = {
+            log: (...args) => logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ')),
+            error: (...args) => logs.push('❌ ' + args.map(a => String(a)).join(' ')),
+            warn: (...args) => logs.push('⚠️ ' + args.map(a => String(a)).join(' ')),
+            info: (...args) => logs.push(args.map(a => String(a)).join(' ')),
+          };
+          const fn = new Function('console', code);
+          const result = fn(fakeConsole);
+          if (result !== undefined) logs.push('→ ' + (typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result)));
+          outputDiv.innerHTML = '<span class="run-label">Output</span>' + (logs.length > 0 ? logs.join('\n') : '<span style="color:#52525b">No output</span>');
+        } catch (e) {
+          outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">' + e.toString() + '</span>';
+        }
+        btn.classList.remove('running');
+        btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
+        lucide.createIcons();
+
+      } else if (lang === 'python' || lang === 'py') {
+        // Run Python via Pyodide in a hidden iframe
+        outputDiv.innerHTML = '<span class="run-label">Output</span><span style="color:#52525b">Loading Python runtime...</span>';
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const pyCode = JSON.stringify(code);
+        iframeDoc.open();
+        iframeDoc.write('<html><body><script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"><\/script><script>async function run(){try{const p=await loadPyodide();p.runPython("import sys,io;sys.stdout=io.StringIO()");p.runPython(' + pyCode + ');const o=p.runPython("sys.stdout.getvalue()");parent.postMessage({type:"pyodide-result",output:o||"(No output)",id:"' + wrapper.id + '"},"*")}catch(e){parent.postMessage({type:"pyodide-result",error:e.toString(),id:"' + wrapper.id + '"},"*")}}run();<\/script></body></html>');
+        iframeDoc.close();
+
+        const handler = (evt) => {
+          if (evt.data && evt.data.type === 'pyodide-result' && evt.data.id === wrapper.id) {
+            window.removeEventListener('message', handler);
+            iframe.remove();
+            if (evt.data.error) {
+              outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">' + evt.data.error + '</span>';
+            } else {
+              outputDiv.innerHTML = '<span class="run-label">Output</span>' + evt.data.output;
+            }
+            btn.classList.remove('running');
+            btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
+            lucide.createIcons();
+          }
+        };
+        window.addEventListener('message', handler);
+
+        // Timeout after 30s
+        setTimeout(() => {
+          window.removeEventListener('message', handler);
+          iframe.remove();
+          if (btn.classList.contains('running')) {
+            outputDiv.innerHTML = '<span class="run-label">Output</span><span class="run-error">Timed out after 30s</span>';
+            btn.classList.remove('running');
+            btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
+            lucide.createIcons();
+          }
+        }, 30000);
+
+      } else if (lang === 'html') {
+        // Render HTML in a sandboxed iframe
+        outputDiv.innerHTML = '<span class="run-label">Preview</span>';
+        const previewFrame = document.createElement('iframe');
+        previewFrame.style.cssText = 'width:100%;min-height:150px;border:none;border-radius:4px;background:#fff;margin-top:6px;';
+        previewFrame.sandbox = 'allow-scripts';
+        outputDiv.appendChild(previewFrame);
+        const pDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+        pDoc.open();
+        pDoc.write(code);
+        pDoc.close();
+        btn.classList.remove('running');
+        btn.innerHTML = '<i data-lucide="play" style="width:12px;height:12px;"></i> Run';
+        lucide.createIcons();
+      }
+    };
+
     window.copyResponse = function(idx) {
       const chat = appState.chats.find(c => c.id === appState.activeChatId);
       if (!chat) return;
@@ -6681,24 +6709,6 @@
       // Store the scoped ID for later reference
       liveToolBox.dataset.liveId = liveId;
 
-      // Thinking box for chain-of-thought / reasoning display
-      const thinkingBox = document.createElement('div');
-      thinkingBox.className = 'thinking-box';
-      thinkingBox.innerHTML = `
-        <div class="thinking-header" onclick="this.parentElement.classList.toggle('collapsed')">
-          <span class="thinking-title">
-            <span class="thinking-spinner"></span>
-            <i data-lucide="check-circle" class="thinking-done-icon" style="width:14px;height:14px;"></i>
-            <span class="thinking-title-text">
-              <span class="thinking-title-main">Thinking</span>
-              <span class="thinking-title-sub">Working through the problem...</span>
-            </span>
-          </span>
-          <i data-lucide="chevron-down" class="thinking-chevron" style="width:14px;height:14px;"></i>
-        </div>
-        <div class="thinking-content"></div>
-      `;
-
       let _toolStartTime = Date.now();
       let _toolStepCount = 0;
 
@@ -6707,7 +6717,6 @@
       bubble.innerHTML = '<div style="display:flex;align-items:center;gap:6px;"><i data-lucide="loader-2" class="spin-loader" style="width:14px;height:14px;"></i> Thinking...</div>';
 
       wrapper.appendChild(liveToolBox);
-      wrapper.appendChild(thinkingBox);
       wrapper.appendChild(bubble);
       row.appendChild(avatar);
       row.appendChild(wrapper);
@@ -6803,33 +6812,8 @@
                     bubble.innerHTML = '';
                     bubble.classList.add('streaming');
                     isFirstDelta = false;
-                    // Activate thinking box with live raw stream
-                    thinkingBox.classList.add('active');
-                    thinkingBox._thinkStart = Date.now();
-                    thinkingBox._thinkInterval = setInterval(() => {
-                      const sub = thinkingBox.querySelector('.thinking-title-sub');
-                      if (sub && thinkingBox.classList.contains('active') && !thinkingBox.classList.contains('collapsed')) {
-                        const elapsed = ((Date.now() - thinkingBox._thinkStart) / 1000).toFixed(1);
-                        sub.textContent = `Thinking... ${elapsed}s`;
-                      }
-                    }, 1000);
                   }
                   outputContent += delta;
-                  // Pipe raw delta into thinking box in real-time
-                  const thinkingContent = thinkingBox.querySelector('.thinking-content');
-                  if (thinkingContent && thinkingBox.classList.contains('active')) {
-                    thinkingContent.textContent = outputContent;
-                    // Auto-collapse after 800ms (skip if verboseMode is on)
-                    if (!appState.verboseMode && !thinkingBox._thinkTimer && outputContent.length > 60) {
-                      thinkingBox._thinkTimer = setTimeout(() => {
-                        if (thinkingBox.classList.contains('active')) {
-                          thinkingBox.classList.add('collapsed');
-                          const sub = thinkingBox.querySelector('.thinking-title-sub');
-                          if (sub) sub.textContent = 'Click to expand raw output';
-                        }
-                      }, 800);
-                    }
-                  }
 
                   // --- Tool call detection & execution ---
                   if (!window._toolCallTracker) window._toolCallTracker = new Set();
@@ -7100,20 +7084,6 @@
         // Finalize FlowBubble by stripping classes and animations
         finalizeFlowBubble(bubble);
 
-        // Finalize thinking box to done state
-        if (thinkingBox.classList.contains('active')) {
-          if (thinkingBox._thinkInterval) { clearInterval(thinkingBox._thinkInterval); delete thinkingBox._thinkInterval; }
-          thinkingBox.classList.remove('active');
-          thinkingBox.classList.add('done');
-          const thinkingContent = thinkingBox.querySelector('.thinking-content');
-          if (thinkingContent && outputContent) {
-            thinkingContent.textContent = outputContent;
-          }
-          const sub = thinkingBox.querySelector('.thinking-title-sub');
-          const elapsed = thinkingBox._thinkStart ? ((Date.now() - thinkingBox._thinkStart) / 1000).toFixed(1) : null;
-          if (sub) sub.textContent = elapsed ? `Thought for ${elapsed}s` : 'Response generated';
-        }
-
         // Transition live tracker to finalized state
         if (logsTracker.length > 0) {
           const totalTime = ((Date.now() - _toolStartTime) / 1000).toFixed(1);
@@ -7178,25 +7148,10 @@
       } catch (err) {
         if (err.name === 'AbortError') {
           console.log('Stream generation aborted by user.');
-          // Still show what we have in the thinking box
-          if (thinkingBox.classList.contains('active')) {
-            if (thinkingBox._thinkInterval) { clearInterval(thinkingBox._thinkInterval); delete thinkingBox._thinkInterval; }
-            thinkingBox.classList.remove('active');
-            thinkingBox.classList.add('done');
-            const sub = thinkingBox.querySelector('.thinking-title-sub');
-            if (sub) sub.textContent = 'Generation stopped';
-          }
         } else {
           console.error(err);
           liveToolBox.style.display = 'none';
           bubble.innerHTML = `<span style="color:#ef4444;font-weight:600;"><i data-lucide="alert-triangle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Stream Connection Failed</span><br><span style="font-size:0.8rem;color:var(--text-muted);">Please verify that the backend is online at: ${appState.settings.proxyUrl}</span>`;
-          if (thinkingBox.classList.contains('active')) {
-            if (thinkingBox._thinkInterval) { clearInterval(thinkingBox._thinkInterval); delete thinkingBox._thinkInterval; }
-            thinkingBox.classList.remove('active');
-            thinkingBox.classList.add('done');
-            const sub = thinkingBox.querySelector('.thinking-title-sub');
-            if (sub) sub.textContent = 'Connection failed';
-          }
         }
       } finally {
         resetSendButton();
